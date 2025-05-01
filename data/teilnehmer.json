@@ -1,0 +1,8 @@
+[
+  {
+    "id": "teilnehmer1",
+    "name": "Max Meier",
+    "wohnort": "Augsburg",
+    "gebuchteAngebote": ["angebot1"]
+  }
+]

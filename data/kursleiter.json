@@ -1,0 +1,27 @@
+[
+  {
+    "id": "leiter1",
+    "name": "Dr. Müller",
+    "gehalt": 3500
+  },
+  {
+    "id": "leiter2",
+    "name": "Prof. Schmidt",
+    "gehalt": 5000
+  },
+  {
+    "id": "leiter3",
+    "name": "Dr. Meier",
+    "gehalt": 4000
+  },
+  {
+    "id": "leiter4",
+    "name": "Prof. Schneider",
+    "gehalt": 5500
+  },
+  {
+    "id": "leiter5",
+    "name": "Dr. Fischer",
+    "gehalt": 4500
+  }
+]
