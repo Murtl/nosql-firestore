@@ -1,0 +1,15 @@
+[
+  {"AngNr": 2, "KursNr": "G08", "TnNr": 143, "Gebuehr": 500},
+  {"AngNr": 2, "KursNr": "P13", "TnNr": 143, "Gebuehr": 400},
+  {"AngNr": 1, "KursNr": "G08", "TnNr": 145, "Gebuehr": null},
+  {"AngNr": 1, "KursNr": "P13", "TnNr": 146, "Gebuehr": 300},
+  {"AngNr": 1, "KursNr": "I09", "TnNr": 146, "Gebuehr": null},
+  {"AngNr": 2, "KursNr": "P13", "TnNr": 149, "Gebuehr": 350},
+  {"AngNr": 1, "KursNr": "I09", "TnNr": 155, "Gebuehr": null},
+  {"AngNr": 1, "KursNr": "I09", "TnNr": 171, "Gebuehr": null},
+  {"AngNr": 1, "KursNr": "I09", "TnNr": 173, "Gebuehr": 400},
+  {"AngNr": 2, "KursNr": "P13", "TnNr": 177, "Gebuehr": null},
+  {"AngNr": 1, "KursNr": "I09", "TnNr": 185, "Gebuehr": 450},
+  {"AngNr": 2, "KursNr": "I09", "TnNr": 187, "Gebuehr": null},
+  {"AngNr": 1, "KursNr": "P13", "TnNr": 194, "Gebuehr": null}
+]
