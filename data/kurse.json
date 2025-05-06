@@ -1,0 +1,12 @@
+[
+  {
+    "id": "kurs1",
+    "titel": "NoSQL Einführung",
+    "voraussetzungen": ["prog-basics"]
+  },
+  {
+    "id": "kurs2",
+    "titel": "C-Programmierung",
+    "voraussetzungen": []
+  }
+]
