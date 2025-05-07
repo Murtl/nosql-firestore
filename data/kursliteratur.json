@@ -1,0 +1,5 @@
+[
+  {"KursNr": "G08", "Bestand": 4, "Bedarf": 2, "Preis": 10.50},
+  {"KursNr": "I09", "Bestand": 2, "Bedarf": 6, "Preis": 8.00},
+  {"KursNr": "P13", "Bestand": 3, "Bedarf": 5, "Preis": 15.20}
+]

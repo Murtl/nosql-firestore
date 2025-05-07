@@ -1,0 +1,7 @@
+[
+  {"VorNr": "G08", "KursNr": "P13"},
+  {"VorNr": "G10", "KursNr": "P13"},
+  {"VorNr": "G08", "KursNr": "I09"},
+  {"VorNr": "G10", "KursNr": "I09"},
+  {"VorNr": "P13", "KursNr": "I09"}
+]

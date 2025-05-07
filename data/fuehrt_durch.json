@@ -1,0 +1,11 @@
+[
+  {"AngNr": 1, "KursNr": "G08", "PersNr": 38197},
+  {"AngNr": 2, "KursNr": "G08", "PersNr": 38197},
+  {"AngNr": 1, "KursNr": "G10", "PersNr": 43325},
+  {"AngNr": 2, "KursNr": "G10", "PersNr": 29594},
+  {"AngNr": 1, "KursNr": "P13", "PersNr": 27183},
+  {"AngNr": 2, "KursNr": "P13", "PersNr": 27183},
+  {"AngNr": 1, "KursNr": "I09", "PersNr": 29594},
+  {"AngNr": 2, "KursNr": "I09", "PersNr": 29594},
+  {"AngNr": 3, "KursNr": "I09", "PersNr": 29594}
+]
