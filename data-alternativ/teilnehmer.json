@@ -4,12 +4,12 @@
     "Ort": "Wedel",
     "teilnahmen": [
       {
-        "AngNr": 2,
+        "AngNr": "2_G08",
         "KursNr": "G08",
         "Gebuehr": 500
       },
       {
-        "AngNr": 2,
+        "AngNr": "2_P13",
         "KursNr": "P13",
         "Gebuehr": 400
       }
@@ -20,7 +20,7 @@
     "Ort": "Augsburg",
     "teilnahmen": [
       {
-        "AngNr": 1,
+        "AngNr": "1_G08",
         "KursNr": "G08",
         "Gebuehr": null
       }
@@ -31,12 +31,12 @@
     "Ort": "Ulm",
     "teilnahmen": [
       {
-        "AngNr": 1,
+        "AngNr": "1_P13",
         "KursNr": "P13",
         "Gebuehr": 300
       },
       {
-        "AngNr": 1,
+        "AngNr": "1_I09",
         "KursNr": "I09",
         "Gebuehr": null
       }
@@ -47,7 +47,7 @@
     "Ort": "Augsburg",
     "teilnahmen": [
       {
-        "AngNr": 2,
+        "AngNr": "2_P13",
         "KursNr": "P13",
         "Gebuehr": 350
       }
@@ -58,7 +58,7 @@
     "Ort": "Muenchen",
     "teilnahmen": [
       {
-        "AngNr": 1,
+        "AngNr": "1_I09",
         "KursNr": "I09",
         "Gebuehr": null
       }
@@ -69,7 +69,7 @@
     "Ort": "Neusaess",
     "teilnahmen": [
       {
-        "AngNr": 1,
+        "AngNr": "1_I09",
         "KursNr": "I09",
         "Gebuehr": null
       }
@@ -80,7 +80,7 @@
     "Ort": "Krumbach",
     "teilnahmen": [
       {
-        "AngNr": 1,
+        "AngNr": "1_I09",
         "KursNr": "I09",
         "Gebuehr": 400
       }
@@ -91,7 +91,7 @@
     "Ort": "Donauwoerth",
     "teilnahmen": [
       {
-        "AngNr": 2,
+        "AngNr": "2_P13",
         "KursNr": "P13",
         "Gebuehr": null
       }
@@ -102,7 +102,7 @@
     "Ort": "Landsberg",
     "teilnahmen": [
       {
-        "AngNr": 1,
+        "AngNr": "1_I09",
         "KursNr": "I09",
         "Gebuehr": 450
       }
@@ -113,7 +113,7 @@
     "Ort": "Augsburg",
     "teilnahmen": [
       {
-        "AngNr": 2,
+        "AngNr": "2_I09",
         "KursNr": "I09",
         "Gebuehr": null
       }
@@ -124,7 +124,7 @@
     "Ort": "Mindelheim",
     "teilnahmen": [
       {
-        "AngNr": 1,
+        "AngNr": "1_P13",
         "KursNr": "P13",
         "Gebuehr": null
       }
