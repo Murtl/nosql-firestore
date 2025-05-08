@@ -27,8 +27,8 @@ async function aufgabe6() {
     for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
         const teilnahmen = await db.collection('teilnehmer').doc(teilnehmerDoc.id).collection('teilnahmen').get();
         for (const t of teilnahmen.docs) {
-            const { AngNr, KursNr } = t.data();
-            const angebotId = `${AngNr}_${KursNr}`;
+            const { AngNr } = t.data();
+            const angebotId = `${AngNr}`;
             angebotTeilnahmeZaehler[angebotId] = (angebotTeilnahmeZaehler[angebotId] || 0) + 1;
         }
     }

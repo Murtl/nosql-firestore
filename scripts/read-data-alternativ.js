@@ -88,8 +88,8 @@ async function aufgabe4() {
         const teilnehmer = tnDoc.data();
         const teilnahmen = await db.collection('teilnehmer').doc(tnDoc.id).collection('teilnahmen').get();
         for (const teilnahme of teilnahmen.docs) {
-            const { AngNr, KursNr } = teilnahme.data();
-            const angebot = await db.collection('angebote').doc(`${AngNr}_${KursNr}`).get();
+            const { AngNr } = teilnahme.data();
+            const angebot = await db.collection('angebote').doc(`${AngNr}`).get();
             if (angebot.exists && angebot.data().Ort === teilnehmer.Ort) {
                 console.log(`- ${teilnehmer.Name}: ${angebot.data().Ort}`);
             }
@@ -103,8 +103,8 @@ async function aufgabe4() {
     for (const tnDoc of teilnehmerSnap.docs) {
         const teilnahmen = await db.collection('teilnehmer').doc(tnDoc.id).collection('teilnahmen').get();
         for (const teilnahme of teilnahmen.docs) {
-            const { AngNr, KursNr } = teilnahme.data();
-            belegteAngebote.add(`${AngNr}_${KursNr}`);
+            const { AngNr} = teilnahme.data();
+            belegteAngebote.add(`${AngNr}`);
         }
     }
     for (const angebotDoc of angeboteSnap.docs) {
@@ -121,8 +121,8 @@ async function aufgabe4() {
     for (const tnDoc of teilnehmerSnap.docs) {
         const teilnahmen = await db.collection('teilnehmer').doc(tnDoc.id).collection('teilnahmen').get();
         for (const teilnahme of teilnahmen.docs) {
-            const { AngNr, KursNr } = teilnahme.data();
-            const key = `${AngNr}_${KursNr}`;
+            const { AngNr} = teilnahme.data();
+            const key = `${AngNr}`;
             teilnahmeCounter[key] = (teilnahmeCounter[key] || 0) + 1;
         }
     }
