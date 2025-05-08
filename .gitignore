@@ -1,5 +1,6 @@
 node_modules
 
 # Ignore WebStorm/IntelliJ IDEA project files
+.idea
 .idea/
 *.iml
