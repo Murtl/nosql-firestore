@@ -46,16 +46,17 @@ async function aufgabe6() {
      * @collections teilnahmen, angebote
      * @id
      *   In "teilnahmen": Dokumenten-ID = AngNr_KursNr_TnNr
-     *   In "angebote": Dokumenten-ID = AngNr_KursNr (z. B. "2_P13")
+     *   In "angebote": Dokumenten-ID = AngNr_KursNr (z.B.: "2_P13")
+     * @delete Nur das Dokument in "angebote" wird gelöscht
      * @logic
-     *   🔸 In SQL: Man könnte dies mit einem GROUP BY + COUNT(*) und HAVING < 2 lösen, z. B.:
+     *   🔸 In SQL: Man könnte dies mit einem GROUP BY + COUNT(*) und HAVING < 2 lösen, z.B.:
      *       DELETE FROM Angebot WHERE (AngNr, KursNr) IN (
      *           SELECT AngNr, KursNr FROM Nimmt_teil GROUP BY AngNr, KursNr HAVING COUNT(*) < 2
      *       );
      *   🔹 In Firestore: Kein GROUP BY – manuelles Zählen notwendig.
      *       Kursangebot muss anhand der dokumentierten Teilnahmebeziehungen analysiert und gelöscht werden.
      * @risk
-     *   🔸 In SQL: Mit referentieller Integrität könnte man verbundene Datensätze konsistent mitlöschen (z. B. via ON DELETE CASCADE).
+     *   🔸 In SQL: Mit referentieller Integrität könnte man verbundene Datensätze konsistent mitlöschen (z.B.: via ON DELETE CASCADE).
      *   🔹 In Firestore: Nur das Angebot wird gelöscht – Daten in anderen Collections wie "gebuehren" oder "fuehrt_durch" bleiben bestehen,
      *       was zu Inkonsistenzen führen kann, wenn nicht separat bereinigt.
      * @difference-to-sql

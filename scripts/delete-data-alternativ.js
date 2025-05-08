@@ -48,6 +48,7 @@ async function aufgabe6() {
      *   In "angebote": Dokumenten-ID = AngNr_KursNr (z.B.: "2_P13")
      *   In "teilnehmer": Dokumenten-ID = TnNr
      *   In Subcollection "teilnahmen": Feld AngNr_KursNr referenziert Angebot
+     * @delete Nur das Dokument in "angebote" wird gelöscht
      * @logic
      *   🔸 In SQL:
      *       DELETE FROM Angebot WHERE (AngNr, KursNr) IN (
