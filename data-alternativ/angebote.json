@@ -1,0 +1,74 @@
+{
+  "1_G08": {
+    "KursNr": "G08",
+    "Datum": "2023-10-13",
+    "Ort": "Wedel",
+    "kursleiter": [
+      38197
+    ]
+  },
+  "2_G08": {
+    "KursNr": "G08",
+    "Datum": "2023-11-24",
+    "Ort": "Ulm",
+    "kursleiter": [
+      38197
+    ]
+  },
+  "1_G10": {
+    "KursNr": "G10",
+    "Datum": "2023-12-01",
+    "Ort": "Augsburg",
+    "kursleiter": [
+      43325
+    ]
+  },
+  "2_G10": {
+    "KursNr": "G10",
+    "Datum": "2023-02-15",
+    "Ort": "Muenchen",
+    "kursleiter": [
+      29594
+    ]
+  },
+  "1_P13": {
+    "KursNr": "P13",
+    "Datum": "2023-05-28",
+    "Ort": "Augsburg",
+    "kursleiter": [
+      27183
+    ]
+  },
+  "2_P13": {
+    "KursNr": "P13",
+    "Datum": "2023-07-01",
+    "Ort": "Augsburg",
+    "kursleiter": [
+      27183
+    ]
+  },
+  "1_I09": {
+    "KursNr": "I09",
+    "Datum": "2023-03-27",
+    "Ort": "Mindelheim",
+    "kursleiter": [
+      29594
+    ]
+  },
+  "2_I09": {
+    "KursNr": "I09",
+    "Datum": "2023-04-23",
+    "Ort": "Muenchen",
+    "kursleiter": [
+      29594
+    ]
+  },
+  "3_I09": {
+    "KursNr": "I09",
+    "Datum": "2023-05-29",
+    "Ort": "Ulm",
+    "kursleiter": [
+      29594
+    ]
+  }
+}
