@@ -41,11 +41,19 @@ vorgenommen werden:
 
 ### ID-Strategie
 
-Die IDs wurden explizit aus den ursprünglichen relationalen Daten generiert, z.B.:
+Die IDs wurden explizit aus den ursprünglichen relationalen Daten generiert, z. B.:
 
-* `angebote`: Kombination aus `AngNr` und `KursNr` → `"1_G08"`
+* `kurse`: `KursNr` → `"G08"`
 * `teilnehmer`: `TnNr` → `"143"`
-* Ähnliches Verfahren für weitere Collections.
+* `angebote`: Kombination aus `AngNr` und `KursNr` → `"1_G08"`
+* `kursleiter`: `PersNr` → `27183`
+* `voraussetzungen`: Kombination aus `VorNr` und `KursNr` → `"G08_I09"`
+* `teilnahmen`: Kombination aus `AngNr`, `KursNr` und `TnNr` → `"1_G08_145"`
+* `fuehrt_durch`: Kombination aus `AngNr` und `KursNr` → `"1_G08"`
+* `gebuehren`: Kombination aus `AngNr`, `KursNr` und `TnNr` → `"1_G08_145"`
+* `kursliteratur`: `KursNr` → `"G08"`
+
+Für weitere Informationen zur ID-Strategie siehe `load-data.js`.
 
 ---
 
@@ -54,7 +62,8 @@ Die IDs wurden explizit aus den ursprünglichen relationalen Daten generiert, z.
 ### (C) Create
 
 Das initiale Laden der Daten erfolgte mittels eines Node.js-Skripts `load-data.js`, das JSON-Daten aus 
-Dateien liest und via Firestore-Client (`google-cloud/firestore`) in die lokale Firestore-Emulator-Datenbank schreibt.
+Dateien liest und mit der zuvor beschriebenen ID-Strategie via Firestore-Client (`google-cloud/firestore`) in die 
+lokale Firestore-Emulator-Datenbank schreibt.
 
 ### (R) Read
 
