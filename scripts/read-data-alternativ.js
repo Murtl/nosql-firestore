@@ -135,6 +135,19 @@ async function aufgabe4() {
     }
 
     // j) Alle Meier
+    /**
+     * @old-relational-table Teilnehmer, Kursleiter
+     * @collections teilnehmer, Kursleiter
+     * @logic
+     *   🔸 In SQL:
+     *       SELECT * FROM Teilnehmer WHERE name LIKE '%Meier%' UNION SELECT * FROM Kursleiter WHERE name LIKE '%Meier%';
+     *   🔹 In Firestore:
+     *       Zwei separate Abfragen:
+     *          - teilnehmer: Name >= 'Meier' und Name <= 'Meier\uf8ff'
+     *          - kursleiter: Name >= 'Meier' und Name <= 'Meier\uf8ff'
+     * @difference-to-sql
+     *   In SQL können Daten aus mehreren Tabellen mit UNION kombiniert werden. In Firestore kann jede Read-Operation nur auf eine Collection angewendet werden, daher werden zwei separate Abfragen durchgeführt.
+     */
     console.log('\n👥 Alle Meier:');
     const teilnehmerMeier = await db.collection('teilnehmer')
         .where('Name', '>=', 'Meier')
@@ -146,6 +159,17 @@ async function aufgabe4() {
     kursleiterMeier.forEach(doc => console.log(`- Kursleiter: ${doc.data().Name}`));
 
     // k) Kurstitel mit Anzahl der Angebote
+    /**
+     * @old-relational-table Kurs, Angebot
+     * @collections kurse, angebote
+     * @logic
+     *   🔸 In SQL:
+     *       SELECT k.titel, COUNT(a.id) AS angebote_count FROM Kurs k LEFT JOIN Angebot a ON k.KursNr = a.KursNr GROUP BY k.KursNr, k.Titel ORDER BY k.Titel;
+     *   🔹 In Firestore:
+     *       Erst alle Kurse laden, dann für jeden Kurs alle Angebote laden und zählen. Alternative wäre zusätzliches Attribut in der Kurse-Collection zu speichern und dieses über Trigger zu aktualisieren.
+     * @difference-to-sql
+     *   Firestore untersützt weder JOINS noch Aggreagationen wie COUNT. Daher muss manuell iteriert und gezählt werden.
+     */
     console.log('\n📚 Kurstitel mit Anzahl der Angebote:');
     const kurseSnap = await db.collection('kurse').get();
     for (const kursDoc of kurseSnap.docs) {
@@ -155,6 +179,17 @@ async function aufgabe4() {
     }
 
     // l) Kurstitel mit Anzahl der Voraussetzungen (mind. 2)
+    /**
+     * @old-relational-table Vorauss, Kurs
+     * @collections voraussetzungen, kurse
+     * @logic
+     *   🔸 In SQL:
+     *       SELECT k.titel FROM Kurs k JOIN Vorauss v ON k.KursNr = v.KursNr GROUP BY k.KursNr, k.Titel HAVING COUNT(v.VorNr) >= 2;
+     *   🔹 In Firestore:
+     *       Erst Kurse laden, dann je Kurs die Subcollection "voraussetzungen" laden und zählen.
+     * @difference-to-sql
+     *   Firestore unterstützt weder JOINS noch Aggreagationen wie COUNT, daher muss manuell iteriert und gezählt werden.
+     */
     console.log('\n📚 Kurstitel mit mindestens 2 Voraussetzungen:');
     const vorausList = [];  // ← hier wird die Liste korrekt initialisiert
     for (const kursDoc of kurseSnap.docs) {
@@ -168,6 +203,18 @@ async function aufgabe4() {
 
 
     // m) Durchschnittliches Gehalt der Kursleiter pro Kurs
+    /**
+     * @alt-structure kurse > angebote > kursleiter (Subcollection)
+     * @collections kurse, angebote, kursleiter
+     * @logic
+     *   🔸 In SQL: SELECT k.Titel, AVG(kl.Gehalt) FROM Kurs k JOIN Fuehrt_Durch fd ON k.KursNr = fd.KursNr JOIN Kursleiter kl ON fd.PersNr = kl.PersNr GROUP BY k.KursNr, k.Titel;
+     *   🔹 In Firestore:
+     *       Für jeden Kurs alle zugehörigen Angebote abfragen.
+     *       Für jedes Angebot die Subcollection `kursleiter` durchgehen und deren Gehälter aufsummieren.
+     *       Danach Durchschnitt berechnen und sortiert ausgeben.
+     * @difference-to-sql
+     *   Kein JOIN oder AVG vorhanden – die geschachtelte Struktur erfordert rekursives Traversieren über mehrere Ebenen.
+     */
     console.log('\n📚 Durchschnittliches Gehalt der Kursleiter pro Kurs:');
     const kursGehaelter = [];
     for (const kursDoc of kurseSnap.docs) {
@@ -190,6 +237,25 @@ async function aufgabe4() {
     kursGehaelter.forEach(e => console.log(`- ${e.titel}: ${e.durchschnitt.toFixed(2)} €`));
 
     // n) Kursleiter-Paare, die denselben Kurs halten
+    /**
+     * @alt-structure angebote > kursleiter (Subcollection), angebote referenzieren KursNr
+     * @collections angebote, kursleiter, kurse
+     * @logic
+     *   🔸 In SQL:
+     *       SELECT kl1.Name, kl2.Name, k.Titel
+     *       FROM Fuehrt_Durch fd1
+     *       JOIN Fuehrt_Durch fd2 ON fd1.KursNr = fd2.KursNr AND fd1.PersNr < fd2.PersNr
+     *       JOIN Kursleiter kl1 ON fd1.PersNr = kl1.PersNr
+     *       JOIN Kursleiter kl2 ON fd2.PersNr = kl2.PersNr
+     *       JOIN Kurs k ON fd1.KursNr = k.KursNr;
+     *   🔹 In Firestore:
+     *       Alle Angebote laden und die `kursleiter`-Subcollections durchgehen.
+     *       Für jede KursNr eine Liste von Leitern aufbauen.
+     *       Wenn mindestens zwei vorhanden sind, alle eindeutigen Paare bilden und ihre Namen + Kurstitel ausgeben.
+     * @difference-to-sql
+     *   Kein Self-Join möglich – Paare müssen manuell im Client konstruiert werden.
+     *   Subcollections pro Angebot erhöhen die Tiefe der Traversierung.
+     */
     console.log('\n👩‍🏫 Kursleiter-Paare für denselben Kurs:');
     const kursLeiterMap = {};
     const angeboteSnapAll = await db.collection('angebote').get();

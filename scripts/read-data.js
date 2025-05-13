@@ -111,6 +111,19 @@ async function aufgabe4() {
     }
 
     // j) Alle Meier
+    /**
+     * @old-relational-table Teilnehmer, Kursleiter
+     * @collections teilnehmer, Kursleiter
+     * @logic
+     *   🔸 In SQL:
+     *       SELECT * FROM Teilnehmer WHERE name LIKE '%Meier%' UNION SELECT * FROM Kursleiter WHERE name LIKE '%Meier%';
+     *   🔹 In Firestore:
+     *       Zwei separate Abfragen:
+     *          - teilnehmer: Name >= 'Meier' und Name <= 'Meier\uf8ff'
+     *          - kursleiter: Name >= 'Meier' und Name <= 'Meier\uf8ff'
+     * @difference-to-sql
+     *   In SQL können Daten aus mehreren Tabellen mit UNION kombiniert werden. In Firestore kann jede Read-Operation nur auf eine Collection angewendet werden, daher werden zwei separate Abfragen durchgeführt.
+     */
     console.log('\n👥 Alle Meier:');
     const meierTeilnehmer = await db.collection('teilnehmer').where('Name', '>=', 'Meier').where('Name', '<=', 'Meier\uf8ff').get();
     meierTeilnehmer.forEach(doc => console.log(`- Teilnehmer: ${doc.data().Name}`));
@@ -118,14 +131,37 @@ async function aufgabe4() {
     meierKursleiter.forEach(doc => console.log(`- Kursleiter: ${doc.data().Name}`));
 
     // k. Kurstitel mit Anzahl der Angebote
+    /**
+     * @old-relational-table Teilnehmer, Kursleiter
+     * @collections teilnehmer, Kursleiter
+     * @logic
+     *   🔸 In SQL:
+     *       SELECT k.titel, COUNT(a.id) AS angebote_count FROM Kurs k LEFT JOIN Angebot a ON k.KursNr = a.KursNr GROUP BY k.KursNr, k.Titel ORDER BY k.Titel;
+     *   🔹 In Firestore:
+     *       Erst alle Kurse laden, dann für jeden Kurs alle Angebote laden und zählen. Alternative wäre zusätzliches Attribut in der Kurse-Collection zu speichern und dieses über Trigger zu aktualisieren.
+     * @difference-to-sql
+     *   Firestore unterstützt weder JOINS noch Aggreagationen wie COUNT, daher muss manuell iteriert und gezählt werden.
+     */
     console.log('\n📚 Kurstitel mit Anzahl der Angebote:');
     const kurseSnapshotAll = await db.collection('kurse').get();
     for (const kursDoc of kurseSnapshotAll.docs) {
-        const angeboteCount = (await db.collection('angebote').where('KursNr', '==', kursDoc.id).get()).size;
+        const kursId = kursDoc.id;
+        const angeboteCount = (await db.collection('angebote').where('KursNr', '==', kursId).get()).size;
         console.log(`- ${kursDoc.data().Titel}: ${angeboteCount} Angebote`);
     }
 
     // l. Kurstitel mit Anzahl der Voraussetzungen (mind. 2 Voraussetzungen)
+    /**
+     * @old-relational-table Vorauss, Kurs
+     * @collections voraussetzungen, kurse
+     * @logic
+     *   🔸 In SQL:
+     *       SELECT k.titel FROM Kurs k JOIN Vorauss v ON k.KursNr = v.KursNr GROUP BY k.KursNr, k.Titel HAVING COUNT(v.VorNr) >= 2;
+     *   🔹 In Firestore:
+     *       Erst alle Voraussetzungen laden und zählen pro Kurs. Dann die Kurse mit mindestens 2 Voraussetzungen laden.
+     * @difference-to-sql
+     *   Firestore unterstützt weder JOINS noch Aggreagationen wie COUNT, daher muss manuell iteriert und gezählt werden.
+     */
     console.log('\n📚 Kurstitel mit mindestens 2 Voraussetzungen:');
     const voraussetzungenSnapshotAll = await db.collection('voraussetzungen').get();
     const voraussetzungCounter = {};
@@ -142,6 +178,17 @@ async function aufgabe4() {
     }
 
     // m. Durchschnittliches Gehalt der Kursleiter pro Kurs
+    /**
+     * @old-relational-table Kursleiter, Fuehrt_Durch, Kurs
+     * @collections kursleiter, fuehrt_durch, kurse
+     * @logic
+     *   🔸 In SQL: SELECT k.Titel, AVG(kl.Gehalt) FROM Kurs k JOIN Fuehrt_Durch fd ON k.KursNr = fd.KursNr JOIN Kursleiter kl ON fd.PersNr = kl.PersNr GROUP BY k.KursNr, k.Titel;
+     *   🔹 In Firestore:
+     *       Alle Dokumente aus fuehrt_durch laden. Für jeden Eintrag das Kursleiter-Gehalt summieren und zählen.
+     *       Danach pro Kurs den Durchschnitt berechnen und Kurstitel nachladen.
+     * @difference-to-sql
+     *   Kein direktes JOIN oder AVG in Firestore – manuelles Sammeln, Aggregieren und Zuordnen erforderlich.
+     */
     console.log('\n📚 Durchschnittliches Gehalt der Kursleiter pro Kurs:');
     const kursGehalt = {};
     const fuehrtDurchSnapshot = await db.collection('fuehrt_durch').get();
@@ -169,6 +216,23 @@ async function aufgabe4() {
     }
 
     // n. Alle Paare von Kursleitern, die denselben Kurs halten
+    /**
+     * @old-relational-table Kursleiter, Fuehrt_Durch, Kurs
+     * @collections kursleiter, fuehrt_durch, kurse
+     * @logic
+     *   🔸 In SQL:
+     *       SELECT kl1.Name, kl2.Name, k.Titel
+     *       FROM Fuehrt_Durch fd1
+     *       JOIN Fuehrt_Durch fd2 ON fd1.KursNr = fd2.KursNr AND fd1.PersNr < fd2.PersNr
+     *       JOIN Kursleiter kl1 ON fd1.PersNr = kl1.PersNr
+     *       JOIN Kursleiter kl2 ON fd2.PersNr = kl2.PersNr
+     *       JOIN Kurs k ON fd1.KursNr = k.KursNr;
+     *   🔹 In Firestore:
+     *       Alle fuehrt_durch-Einträge laden. Pro Kurs eine Set-Liste aller Leiter aufbauen.
+     *       Für Kurse mit mehr als einem Leiter alle eindeutigen Paare bilden und deren Namen + Kurstitel nachladen.
+     * @difference-to-sql
+     *   Kein Self-Join in Firestore möglich. Paare müssen clientseitig gebildet und nacheinander aufgelöst werden.
+     */
     console.log('\n👩‍🏫 Paare von Kursleitern, die denselben Kurs halten:');
     const kursAngeboteLeiter = {};
     fuehrtDurchSnapshot.docs.forEach(doc => {
