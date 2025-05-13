@@ -25,6 +25,15 @@ async function aufgabe4() {
     console.log('\n👩‍🏫 Kursleiter (Gehalt 3000€-4000€):');
     kursleiter.forEach(doc => console.log(`- ${doc.data().Name}: ${doc.data().Gehalt}€`));
 
+        @ Firestore-Logik:
+    // - Alle Dokumente aus 'angebote' laden
+    // - Für jedes Angebot: 'KursNr' auslesen
+    // - Passenden Kurs aus 'kurse' über KursNr als Dokument-ID nachladen
+    // - Ausgabe: kurs.Titel, angebot.Datum, angebot.Ort
+
+    @ SQL-Vergleich: SELECT k.Titel, a.Datum, a.Ort FROM Angebot a JOIN Kurs k ON a.KursNr = k.KursNr
+    // Firestore-Problem: Kein JOIN → jeder Kurs muss einzeln nachgeladen werden
+
     // d) Kurstitel mit Datum und Ort
     console.log('\n📚 Kurstitel mit Datum und Ort:');
     const angebote = await db.collection('angebote').get();
@@ -35,6 +44,15 @@ async function aufgabe4() {
             console.log(`- ${kurs.data().Titel}: ${angebot.Datum} in ${angebot.Ort}`);
         }
     }
+
+    @ Firestore-Logik:
+    // - Alle 'angebote' durchgehen
+    // - 'KursNr' → Titel über 'kurse' holen (wie d)
+    // - 'kursleiter': Array mit PersNr im Angebot
+    // - Für jede PersNr: passendes Dokument aus 'kursleiter' nachladen
+
+    @Firestore SQL-Vergleich: JOIN mit Fuehrt_durch und Kursleiter
+    // Problem: Für jeden Kursleiter ein separates Read nötig
 
     // e) Kurstitel mit Datum, Ort und Kursleiter
     console.log('\n📚 Kurstitel mit Datum, Ort und Kursleiter:');
@@ -52,6 +70,16 @@ async function aufgabe4() {
         const leiterText = kursleiterNamen.length > 0 ? kursleiterNamen.join(', ') : 'Keine Angabe';
         console.log(`- ${kurs.data().Titel}: ${angebot.Datum}, ${angebot.Ort}, Kursleiter: ${leiterText}`);
     }
+
+
+    @ Firestore-Logik:
+    // - Alle Kurse aus 'kurse' laden
+    // - 'voraussetzungen': Array mit KursNr
+    // - Für jede KursNr in Voraussetzungen den Kurstitel aus 'kurse' nachladen
+    // - Wenn leer → Ausgabe „NULL“ als Text
+
+    @ SQL-Vergleich: LEFT JOIN Vorauss v ON KursNr
+    // Nachteil: wie vorher kein join möglich (left join)– leere Felder müssen manuell behandelt werden
 
     // f) Kurstitel mit Voraussetzungen
     console.log('\n📚 Kurstitel mit Voraussetzungen:\n');
@@ -80,6 +108,15 @@ async function aufgabe4() {
         const vorausText = kurs.vorausTitel.join(', ');
         console.log(kurs.kursTitel.padEnd(40) + vorausText);
     }
+       
+        @ Firestore-Logik:
+        // - Alle Teilnehmer durchgehen
+        // - Für jeden Teilnehmer: teilnahmen[] prüfen
+        // - Jede Teilnahme enthält AngNr (z. B. '1_P13')
+        // - Das passende Angebot aus 'angebote' holen → Ort vergleichen mit Teilnehmer.Ort
+
+        @ SQL-Vergleich: JOIN Teilnehmer, Nimmt_teil, Angebot WHERE Ort übereinstimmt
+        // Nachteil: Kein Mehrfach-JOIN → viel manuelle Verknüpfung + viele Reads
 
     // g) Teilnehmer, die einen Kurs am eigenen Wohnort gebucht haben
     console.log('\n👥 Teilnehmer am eigenen Wohnort:');
@@ -95,6 +132,14 @@ async function aufgabe4() {
             }
         }
     }
+    
+    @ Firestore-Logik:
+    // - Alle teilnahmen[] aller Teilnehmer durchgehen → belegte AngNr sammeln (Set)
+    // - Alle Angebote durchgehen → ID vergleichen mit Set
+    // - Wenn nicht enthalten → anzeigen
+
+    @ SQL-Vergleich: LEFT JOIN mit WHERE Teilnehmer IS NULL
+    // Nachteil: Firestore hat kein LEFT JOIN → Existenz muss manuell geprüft werden
 
     // h) Kursangebote ohne Teilnehmer
     console.log('\n📚 Kursangebote ohne Teilnehmer:');
@@ -114,6 +159,16 @@ async function aufgabe4() {
             console.log(`- ${kurs.exists ? kurs.data().Titel : angebot.KursNr}, Angebot ${angebotDoc.id}`);
         }
     }
+
+    
+    @ Firestore-Logik:
+    // - Alle teilnahmen[] sammeln
+    // - Jede AngNr zählen → Map[AngNr] = Anzahl
+    // - Nur Einträge mit count ≥ 2 behalten
+    // - Kursname über KursNr aus 'kurse' nachladen
+
+    @ SQL-Vergleich: GROUP BY + HAVING COUNT(*) >= 2
+    // Nachteil: Keine Aggregation in Firestore → Zählen muss manuell erfolgen
 
     // i) Kurse mit mindestens 2 Teilnehmern
     console.log('\n📚 Kurse mit mind. 2 Teilnehmern:');
