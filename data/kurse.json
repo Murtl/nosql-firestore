@@ -5,13 +5,10 @@
       "Bestand": 4,
       "Bedarf": 2,
       "Preis": 10.5
-    },
-    "voraussetzungen": []
+    }
   },
   "G10": {
-    "Titel": "Grundlagen II",
-    "kursliteratur": {},
-    "voraussetzungen": []
+    "Titel": "Grundlagen II"
   },
   "P13": {
     "Titel": "C-Programmierung",
