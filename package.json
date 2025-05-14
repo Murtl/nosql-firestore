@@ -2,9 +2,12 @@
   "name": "nosql-firestore",
   "version": "1.0.0",
   "description": "Umsetzung der Semesteraufgabe im Wahlfach NoSQL mit Firestore (lokal) im SoSe25",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "load-data": "ts-node scripts/load-data.ts",
+    "read-data": "ts-node scripts/read-data-ts.ts",
+    "update-data": "ts-node scripts/update-data-ts.ts",
+    "delete-data": "ts-node scripts/delete-data-ts.ts"
   },
   "repository": {
     "type": "git",
@@ -14,5 +17,10 @@
   "license": "MIT",
   "dependencies": {
     "@google-cloud/firestore": "^7.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }

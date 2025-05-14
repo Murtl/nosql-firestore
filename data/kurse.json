@@ -1,6 +1,38 @@
-[
-  {"KursNr": "G08", "Titel": "Grundlagen I"},
-  {"KursNr": "G10", "Titel": "Grundlagen II"},
-  {"KursNr": "P13", "Titel": "C-Programmierung"},
-  {"KursNr": "I09", "Titel": "Datenbanken"}
-]
+{
+  "G08": {
+    "Titel": "Grundlagen I",
+    "kursliteratur": {
+      "Bestand": 4,
+      "Bedarf": 2,
+      "Preis": 10.5
+    }
+  },
+  "G10": {
+    "Titel": "Grundlagen II"
+  },
+  "P13": {
+    "Titel": "C-Programmierung",
+    "kursliteratur": {
+      "Bestand": 3,
+      "Bedarf": 5,
+      "Preis": 15.2
+    },
+    "voraussetzungen": [
+      "G08",
+      "G10"
+    ]
+  },
+  "I09": {
+    "Titel": "Datenbanken",
+    "kursliteratur": {
+      "Bestand": 2,
+      "Bedarf": 6,
+      "Preis": 8.0
+    },
+    "voraussetzungen": [
+      "G08",
+      "G10",
+      "P13"
+    ]
+  }
+}

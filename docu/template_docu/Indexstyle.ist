@@ -1,0 +1,14 @@
+% makeIndex-Stildatei
+
+quote '+'
+
+preamble "\\begin{theindex}\n\\thispagestyle{empty}\n"
+heading_prefix "{\\bfseries\\Large\\sffamily "     % vor dem Buchstaben
+heading_suffix "\\hfil}\\nopagebreak\n" % nach dem Buchstaben
+symhead_positive "Symbole"
+numhead_positive "Zahlen"
+headings_flag    1
+
+delim_0 "\\dotfill "
+delim_1 "\\dotfill "
+delim_2 "\\dotfill "

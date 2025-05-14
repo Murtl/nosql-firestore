@@ -7,7 +7,6 @@ async function aufgabe5() {
     console.log('♻️ Aufgabe 5: Update Queries\n');
 
     // a) Alle Angebote vom Jahr 2023 auf 2024 aktualisieren
-
     /**
      * @old-relational-table Angebot
      * @collection angebote
@@ -27,7 +26,7 @@ async function aufgabe5() {
     const angeboteSnapshot = await db.collection('angebote').get();
     for (const doc of angeboteSnapshot.docs) {
         const angebot = doc.data();
-        if (angebot.Datum && angebot.Datum.includes('2023')) {
+        if (angebot.Datum.includes('2023')) {
             const neuesDatum = angebot.Datum.replace('2023', '2024');
             await doc.ref.update({ Datum: neuesDatum });
             console.log(`🔄 Angebot ${doc.id} Datum aktualisiert auf ${neuesDatum}`);
@@ -35,7 +34,6 @@ async function aufgabe5() {
     }
 
     // b) Alle Angebote von "Wedel" nach "Augsburg"
-
     /**
      * @old-relational-table Angebot
      * @collection angebote

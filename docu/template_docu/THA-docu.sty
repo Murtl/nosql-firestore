@@ -1,0 +1,450 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{THA-Abschlussarbeit}[2024/01/08 package to provide a great standard config for a thesis at the THA]
+
+\RequirePackage{xparse}
+\RequirePackage{xcolor}
+\RequirePackage{pgfmath}
+\RequirePackage{enumitem}
+\RequirePackage{etoolbox}
+\RequirePackage{listofitems}
+
+\RequirePackage{scrhack}
+\RequirePackage{blindtext}
+\RequirePackage[
+colorlinks=true
+]{hyperref}
+\RequirePackage{kvoptions}
+
+\RequirePackage{url}
+\RequirePackage{booktabs, tabularx}
+\RequirePackage{multirow}
+
+\RequirePackage{amssymb}
+\RequirePackage{amsmath}
+\RequirePackage{dsfont}
+\RequirePackage{nicefrac}
+\RequirePackage{array}
+\RequirePackage{calc}          % From LaTeX distribution
+\RequirePackage{graphicx}      % From LaTeX distribution
+\RequirePackage{scrlayer-scrpage}
+\RequirePackage{setspace}
+\RequirePackage{microtype}
+\RequirePackage{xspace}
+% font selection
+\RequirePackage{newtxtext,newtxmath,newtxtt}
+
+\RequirePackage{enumitem}
+\RequirePackage{tikz}
+% \RequirePackage{geometry}
+\RequirePackage[pass]{geometry}
+
+\SetupKeyvalOptions{
+  family = thesis,
+  prefix = thesis@
+}
+
+\DeclareStringOption[Please provide author name]{authorName}
+\DeclareStringOption[Please provide author enrolmentNo]{authorEnrolmentNo}
+\DeclareStringOption[Please provide author street]{authorStreet}
+\DeclareStringOption[Please provide author city]{authorCity}
+\DeclareStringOption[Please provide author zip]{authorZip}
+\DeclareStringOption[Please provide author e-mail]{authorEMail}
+\DeclareStringOption[Please provide author phone]{authorPhone}
+\DeclareStringOption[Augsburg]{authorSignaturePlace}
+\DeclareStringOption[Please provide study program]{studyProgram}
+\DeclareStringOption[Please provide study degree]{studyDegree}
+\DeclareStringOption[Please provide thesis title]{thesisTitle}
+\DeclareStringOption[Thesis]{thesisType}
+\DeclareStringOption[Please provide faculty]{faculty}
+\DeclareStringOption[\today]{topicAssignment}
+\DeclareStringOption[\today]{submissionDate}
+\DeclareStringOption{defenseDate}
+\DeclareStringOption[de]{language}
+\DeclareBoolOption[false]{nonDisclosure}
+\DeclareStringOption[Please provide first supervisor]{supervisor}
+\DeclareStringOption{supervisorDeputy}
+\DeclareStringOption[Technische Hochschule\\ Augsburg]{universityName}
+\DeclareStringOption[An der Hochschule 1]{universityAddress}
+\DeclareStringOption[D-86161]{universityZip}
+\DeclareStringOption[Augsburg]{universityCity}
+\DeclareStringOption[+49\,821\,5586-0]{universityPhone}
+\DeclareStringOption[+49\,821\,5586-3222]{universityFax}
+\DeclareStringOption[www.tha.de]{universityURL}
+\DeclareStringOption[info@tha.de]{universityEMail}
+\DeclareBoolOption[false]{showDiesel}
+
+\ProcessKeyvalOptions*
+
+%###
+\ifthenelse{\equal{\thesis@language}{en}}
+{\input{i18n/en} \newcommand{\thesisLanguage}{english}}
+{\input{i18n/de} \newcommand{\thesisLanguage}{ngerman}}
+%###
+
+\setkomafont{sectioning}{\sffamily}
+
+% ------------------------------
+% placement options for floats
+% ------------------------------
+\renewcommand{\floatpagefraction}{.8} % Minimaler Anteil einer Seite, 
+                                      % der bei einer p-Plazierung eines 
+                                      % oder mehrerer Gleitobjekte erreicht
+                                      % werden muss. Voreinstellung: 0.5
+\renewcommand{\textfraction}{.15}     % normalerweise 1 - \floatpagefraction
+\renewcommand{\topfraction}{.85}
+\renewcommand{\bottomfraction}{.7}
+\setcounter{topnumber}{9}             % maximale Anzahl floats pro Seitenkopf
+\setcounter{bottomnumber}{9}          % maximale Anzahl floats pro Seitenfuss
+\setcounter{totalnumber}{20}
+
+
+%%% -----------------------------------------------------
+%%% Fussnoteneinstellungen
+%%% -----------------------------------------------------
+\deffootnote[1em]{1em}{1em}{\textsuperscript{\thefootnotemark}}
+% weg mit dem doofen Einzug bei mehrzeiligen Fussnoten
+\renewcommand{\footnoterule}{\vspace*{4pt}\noindent\rule{0.4\textwidth}{0.4pt}\vspace*{4pt}}
+
+
+%%% --------------------------------------------------
+%%% eingebundene Pakete
+%%% --------------------------------------------------
+\usepackage[english,ngerman]{babel} % main language is the second one
+
+\renewcommand{\[}{\begin{equation}}
+\renewcommand{\]}{\end{equation}}
+
+%% --------------------------------------------------
+%% Literatur: biblatex mit biber
+%% --------------------------------------------------
+\usepackage[babel,autostyle]{csquotes}
+\usepackage[%
+    backend=biber,
+    style=authoryear,
+    dashed=false,
+    sortlocale=de_DE,
+    natbib=true,
+    url=false, 
+    isbn=false,
+    eprint=false,
+    bibencoding=utf8,
+    safeinputenc,
+    maxbibnames=99,
+    maxcitenames=2,
+    refsegment=chapter, 
+    defernumbers=true,
+    parentracker=true,
+    backref=true,
+    backrefstyle=three
+]{biblatex}
+\DeclareBibliographyCategory{Buch} 
+\addbibresource{Literatur_Abschlussarbeit.bib}
+\renewcommand{\bibfont}{\small}
+\renewcommand*{\nameyeardelim}{\addspace} 
+\setlength{\bibhang}{0em}
+\setlength{\bibitemsep}{1ex}
+\defbibheading{bibliography}[\bibname]{%
+\section*{#1}%
+\markboth{#1}{#1}}
+\newcommand*{\citeB}[1]{\citet{#1}}
+\newcommand*{\nociteB}[1]{\nocite{#1}}
+%%
+% citeQ sonstige Quelle (z.B. für Grafiken)
+\newcommand*{\citeQ}[2][]{\addtocategory{sonstigeQuellen}{#2}\citet[#1]{#2}}
+
+% --------------------------------------------------
+% Zeilenumbrucheinstellungen
+% --------------------------------------------------
+
+% Strafpunkte: Je höher Wert, desto unwahrscheinlicher
+\linepenalty=10
+\clubpenalty=1000 % Zeile allein in letztem Absatz
+\widowpenalty=1000 % Zeile allein in erstem Absatz
+%\emergencystretch=0.015\hsize
+%\interlinepenalty=100000
+
+\renewcommand*\thechapter {\@arabic\c@chapter}
+\renewcommand*\thesection {\thechapter.\@arabic\c@section}
+\renewcommand*\thetable   {\thechapter.\@arabic\c@table}
+
+%%% Kein 'Kapitel' in der Kapitelueberschrift
+\renewcommand{\chaptername}{}
+
+%%% --------------------
+%%% defining the header
+%%% --------------------
+\pagestyle{scrheadings}
+\ohead{\pagemark}
+\rehead{\rightmark}
+\lohead{\leftmark}
+\ihead{\headmark}
+\chead{}
+\renewcommand{\headfont}{\normalfont\sffamily}
+\setkomafont{pagenumber}{\normalfont\sffamily}
+% leere fusszeile:
+\lefoot{}\rofoot{}
+\ofoot{}\cfoot{} % Fusszeile bei einseitigem Druck
+
+\newcommand{\Ridx}[1]{\cd{#1}\index{R Kommandos@\R Kommandos!#1@\cd{#1}}}
+\newcommand{\idx}[1]{\index{#1}}
+
+%%% Setze den Durchschuss (Zeilenabstand)
+\setstretch{1.0}
+
+%%% --------------------------------------------------
+%%% Code Umgebung
+%%% --------------------------------------------------
+\definecolor{CodeColor}{gray}{0.85}
+\newenvironment{CodeShaded}{%
+  \def\FrameCommand{\colorbox{CodeColor}}%
+  \MakeFramed {\FrameRestore}}{
+  \endMakeFramed}
+
+\newenvironment{code}{%
+\begin{lstlisting}
+}{%
+\end{lstlisting}
+}
+
+\renewcommand{\emph}[1]{\textit{#1}}
+
+%%% ------------------------------
+%%% font related stuff
+%%% ------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\setlist[description]{font=\normalfont\itshape\space}
+\setlist{nosep}
+
+% Aufzählung im Inhaltsverzeichnis serifenlos
+\newcommand*\tocentryformat[1]{{\sffamily#1}}
+\RedeclareSectionCommands
+  [
+    tocentryformat=\tocentryformat,
+    tocpagenumberformat=\tocentryformat
+  ]
+  {section,subsection,subsubsection,paragraph,subparagraph}
+
+%%% --------------------------------------------------
+%%% Index und Co.
+%%% --------------------------------------------------
+\usepackage{makeidx}
+\renewcommand{\indexname}{Stichwortverzeichnis}
+\makeindex
+\usepackage[columns=3
+           ,unbalanced=true
+           ,columnsep=2em
+           ,rule=0pt
+           ,indentunit=5pt
+           ]{idxlayout}
+%
+\usepackage{index}
+\makeindex
+
+\newindex{R}{Ridx}{Rind}{\R Kommandoverzeichnis}
+\renewindex{default}{idx}{ind}{Stichwortverzeichnis}
+
+%%%%%%%%%%%%%%%%%%%%
+% Colors of THA CI %
+%%%%%%%%%%%%%%%%%%%%
+% \definecolor{<name>}{<colorspace>}{<values>}
+
+% Prime colors
+\definecolor{THAred}  {RGB}{255,  3 80}
+\definecolor{THAwhite}{RGB}{255,255,255}
+
+% Secondary colors
+\definecolor{THAblack}{RGB}{  0,  0,  0}
+\definecolor{THAgrey4}{RGB}{ 89, 89, 89}
+\definecolor{THAgrey3}{RGB}{129,129,129}
+\definecolor{THAgrey2}{RGB}{204,204,204}
+\definecolor{THAgrey1}{RGB}{242,242,242}
+
+% Functional colors
+\definecolor{THAgreen} {RGB}{  0,195, 66}
+\definecolor{THAyellow}{RGB}{255,199,  0}
+
+% das rot kann man bei den Refs nicht aushalten, deshalb ein "passendes" dunkles blau
+\definecolor{THAblue}   {RGB}{ 0,  66,195} 
+%\definecolor{THAdarkRed}{RGB}{195, 0,  66} 
+
+% Vorschlag Farben Prof. Dr. Markus Degen
+% laut ChatGPT:
+% #FF0350    RGB: 255, 3, 80 (Vivid Pink)
+
+% #FFEC03    RGB: 255, 236, 3 (Bright Yellow)
+% #03C5FF    RGB: 3, 197, 255 (Cyan Blue)
+
+% #BF325C    RGB: 191, 50, 92 (Deep Pinkish-Red)
+% #3A91AA    RGB: 58, 145, 170 (Muted Blue)
+% #AAA23A    RGB: 170, 162, 58 (Olive Green)
+
+% #804154    RGB: 128, 65, 84 (Muted Burgundy)
+% #3A4F55    RGB: 58, 79, 85 (Dark Slate Gray)
+% #55533A    RGB: 85, 83, 58 (Olive Brown)
+
+\definecolor{THAi-VividPink}   {HTML}{FF0350}
+% abgeleitet
+\definecolor{THAi-BrightYellow}{HTML}{FFEC03} 
+\definecolor{THAi-CyanBlue}    {HTML}{03C5FF} 
+
+\definecolor{THAi-PinkishRed}  {HTML}{BF325C}
+\definecolor{THAi-Blue}        {HTML}{3A91AA}
+\definecolor{THAi-OliveGreen}  {HTML}{AAA23A}
+
+\definecolor{THAi-Burgundy}    {HTML}{804154}
+\definecolor{THAi-SlateGray}   {HTML}{3A4F55}
+\definecolor{THAi-OliveBrown}  {HTML}{55533A}
+
+% ---------------------------------------------
+% Textbausteine
+% ---------------------------------------------
+\newcommand{\THAtitlepage}{
+\begingroup
+\newcommand*{\THAfont}{\fontfamily{phv}\selectfont}
+
+\newgeometry{left = 27mm, right = 15mm, top = 20mm, head = 0mm, textheight = 276mm}
+\begin{titlepage}
+\THAfont
+\begin{minipage}[t]{125mm}
+\hspace{-0.2cm} \includegraphics[width=60mm]{img/Logo}
+\end{minipage}
+\qquad
+\begin{minipage}[t]{40mm}
+\vspace{-1.3cm}
+{\color{THAred} \fontsize{12}{12} \selectfont \textbf{\thesis@faculty}}
+\end{minipage}
+
+\vspace{20mm}
+
+\begin{minipage}[t][15cm][t]{125mm}
+{\color{THAred} \fontsize{18}{18} \selectfont \textbf{\thesis@thesisType}} \\[0.5ex]
+{\fontsize{12}{18} \selectfont {\small \localeReachingDegree}\\[0.1ex] }
+
+\vspace{18mm}
+
+{\color{THAred} \fontsize{18}{30} \selectfont  
+\textbf{\thesis@thesisTitle} 
+}
+
+\vspace{16mm}
+
+{\fontsize{15}{18}  \selectfont 
+{\small \localeCreatedBy} \\ \localeCreators
+}
+
+\vspace{55mm}
+
+ \fontsize{11}{18}  \selectfont
+%\begin{tabularx}{\textwidth}{ll} \toprule
+  %  \localeSupervisor  & \thesis@supervisor \\%
+%\ifthenelse{\equal{\thesis@supervisorDeputy}{}}{}{\localeSupervisorDep  & \thesis@supervisorDeputy \\}% 
+  %  \localeTopicAssignment  & \thesis@topicAssignment \\
+    %\localeSubmittedOn  & \thesis@submissionDate \\
+%\ifthenelse{\equal{\thesis@defenseDate}{}}{}{\localeDefenseOn  & \thesis@defenseDate \\}%
+  %  \localeNDA & \ifthenelse{\boolean{thesis@nonDisclosure}}{\localeYes}{\localeNo}  \\
+    %\bottomrule
+%\end{tabularx}
+
+\end{minipage}
+\qquad
+\begin{minipage}[t][15cm][t]{40mm}
+
+\vspace{70mm}
+
+\fontsize{7}{10} \selectfont
+%\textbf{\thesis@authorName} \\[3mm]
+%\thesis@authorStreet \\
+%\thesis@authorZip \ \thesis@authorCity \\
+%\localePhone \ \thesis@authorPhone \\
+%\thesis@authorEMail \\[2mm]
+%\localeEnromentNumber: \\
+%\thesis@authorEnrolmentNo
+
+\vspace{8mm}
+
+{\color{THAred}
+  \textbf{\thesis@universityName} \\[3mm]
+}%
+\thesis@universityAddress \\
+\thesis@universityZip \ \thesis@universityCity \\
+\localePhone \ \thesis@universityPhone \\
+\localeFax \ \thesis@universityFax \\
+\thesis@universityURL \\
+\thesis@universityEMail
+
+\ifthenelse{\boolean{thesis@showDiesel}}{
+  \vspace{3.0cm}
+  \hspace{-0.2cm} \includegraphics[width=3cm]{img/Diesel}
+}{}
+\end{minipage}
+\end{titlepage}
+\endgroup % end of font switch
+\restoregeometry
+}
+
+% ----------------------------------------------------------
+% ----- listings settings
+\usepackage[final]{listings}
+\lstloadlanguages{Perl,XML}
+\definecolor{CodeColor}{gray}{0.1}
+\lstset{%language=XML, 
+        basicstyle=\ttfamily,
+        numbersep=2ex,numberstyle=\scriptsize,
+        xleftmargin=4ex,
+        xrightmargin=2ex,
+        aboveskip=2\medskipamount,
+        belowskip=2ex,
+        breaklines=true,
+        }
+\newcommand{\cd}[1]{\lstinline{#1}}
+
+
+% ----------------------------------------------------------
+% inline code aus dem listings Paket skaliert (automatisch) 
+% nicht richtig; workaround mit Makro
+% (https://tinyurl.com/yg9wcfox)
+\makeatletter
+
+\newcommand\applyCurrentFontsize
+{%
+  % we first save the current fontsize, baseline-skip,
+  % and listings' basicstyle
+  \let\f@sizeS@ved\f@size%
+  \let\f@baselineskipS@ved\f@baselineskip%
+  \let\basicstyleS@ved\lst@basicstyle%
+  % we now change the fontsize of listings' basicstyle
+  \renewcommand\lst@basicstyle%
+  {%
+      \basicstyleS@ved%
+      \fontsize{\f@sizeS@ved}{\f@baselineskipS@ved}%
+      \selectfont%
+  }%
+}
+\makeatother
+
+\newcommand\lstI[2][]
+{%
+  \bgroup%
+    \lstset{#1}%
+    \applyCurrentFontsize%
+    % ... possibly other macros whose effects should remain local ...
+    \lstinline|#2|%
+  \egroup%
+}
+
+\newcommand{\ANF}[1]{"`#1"'}
+\renewcommand{\paragraph}{\minisec}
+
+% redefine the labels, if rquiered. Also look at the order of the babel package
+% \renewcommand{\figureautorefname}{Abbildung}
+% \renewcommand{\tableautorefname}{Tabelle}
+% \renewcommand{\sectionautorefname}{Abschnitt}
+% \renewcommand{\subsectionautorefname}{Unterabschnitt}
+% \renewcommand{\subsectionautorefname}{Unterabschnitt}
+
+%
+\usepackage[ngerman, nameinlink,capitalize]{cleveref}
+%\renewcommand{\AMSautorefname}{Gleichung}
+%\renewcommand{\equationautorefname}{Gleichung}

@@ -29,25 +29,22 @@ Umsetzung der Semesteraufgabe im Wahlfach NoSQL mit Firestore (lokal) im SoSe25
   npm install
   ```
 - Nachdem der Emulator läuft, können die Skripte aus dem `scripts`-Ordner ausgeführt werden
-- Die Skripte sind in JavaScript geschrieben und können mit Node.js im Ordner scripts ausgeführt werden (Standard für Firestore):
+- Die Skripte sind bereits in der `package.json` als `npm`-Skripte hinterlegt, sodass sie einfach mit 
   ```bash
-  node <script-name>.js
+  npm run <script-name>
   ```
+  ausgeführt werden können. Zum Beispiel:
+  ```bash
+  npm run load-data
+  ```
+
 
 ## Verzeichnisstruktur
 - `data/` - Enthält die Daten im json-Format, die über die Skripte in unsere Firestore-DB geschrieben werden
+- `docu/` - Enthält die Dokumentation
 - `firestore-emulator/` - Enthält den Emulator
+- `node_modules/` - Enthält die Abhängigkeiten, die über `npm install` installiert werden
+- `old-approach/` - Enthält den alten Ansatz, der nicht mehr verwendet wird
 - `scripts/` - Enthält die Skripte, die unsere CRUD-Operation für die Firestore-DB durchführen
 
-
-## Anwendungsbeispiel
-(Wichtig: Im Terminal nach ./scripts navigieren, um die Skripte auszuführen)
-- `scripts/load-data.js` - Beispiel für das Einfügen von Daten in die Firestore-DB
-  ```bash
-    node load-data.js 
-    ```
-- `scripts/query-examples.js` - Beispiel für das Auslesen von Daten mit Bedingungen aus der Firestore-DB
-  ```bash
-    node query-examples.js 
-  ```
   
