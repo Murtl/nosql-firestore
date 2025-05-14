@@ -1,0 +1,14 @@
+#TeXlipse project settings
+#Mon Jan 08 13:59:37 CET 2024
+outputDir=
+markDer=true
+mainTexFile=Abschlussarbeit-ohneR.tex
+bibrefDir=
+builderNum=2
+outputFile=Abschlussarbeit.pdf
+makeIndSty=
+srcDir=
+markTmpDer=true
+tempDir=tmp
+outputFormat=pdf
+langSpell=de

@@ -1,13 +1,133 @@
-[
-  {"TnNr": 143, "Name": "Schmidt, M.", "Ort": "Wedel"},
-  {"TnNr": 145, "Name": "Huber, Chr.", "Ort": "Augsburg"},
-  {"TnNr": 146, "Name": "Abele, I.", "Ort": "Ulm"},
-  {"TnNr": 149, "Name": "Kircher, B.", "Ort": "Augsburg"},
-  {"TnNr": 155, "Name": "Meier, W.", "Ort": "Muenchen"},
-  {"TnNr": 171, "Name": "Moeller, H.", "Ort": "Neusaess"},
-  {"TnNr": 173, "Name": "Schulze, B.", "Ort": "Krumbach"},
-  {"TnNr": 177, "Name": "Mons, F.", "Ort": "Donauwoerth"},
-  {"TnNr": 185, "Name": "Meier, K.", "Ort": "Landsberg"},
-  {"TnNr": 187, "Name": "Karstens, L.", "Ort": "Augsburg"},
-  {"TnNr": 194, "Name": "Gerstner, M.", "Ort": "Mindelheim"}
-]
+{
+  "143": {
+    "Name": "Schmidt, M.",
+    "Ort": "Wedel",
+    "teilnahmen": [
+      {
+        "AngNr": "2_G08",
+        "KursNr": "G08",
+        "Gebuehr": 500
+      },
+      {
+        "AngNr": "2_P13",
+        "KursNr": "P13",
+        "Gebuehr": 400
+      }
+    ]
+  },
+  "145": {
+    "Name": "Huber, Chr.",
+    "Ort": "Augsburg",
+    "teilnahmen": [
+      {
+        "AngNr": "1_G08",
+        "KursNr": "G08",
+        "Gebuehr": null
+      }
+    ]
+  },
+  "146": {
+    "Name": "Abele, I.",
+    "Ort": "Ulm",
+    "teilnahmen": [
+      {
+        "AngNr": "1_P13",
+        "KursNr": "P13",
+        "Gebuehr": 300
+      },
+      {
+        "AngNr": "1_I09",
+        "KursNr": "I09",
+        "Gebuehr": null
+      }
+    ]
+  },
+  "149": {
+    "Name": "Kircher, B.",
+    "Ort": "Augsburg",
+    "teilnahmen": [
+      {
+        "AngNr": "2_P13",
+        "KursNr": "P13",
+        "Gebuehr": 350
+      }
+    ]
+  },
+  "155": {
+    "Name": "Meier, W.",
+    "Ort": "Muenchen",
+    "teilnahmen": [
+      {
+        "AngNr": "1_I09",
+        "KursNr": "I09",
+        "Gebuehr": null
+      }
+    ]
+  },
+  "171": {
+    "Name": "Moeller, H.",
+    "Ort": "Neusaess",
+    "teilnahmen": [
+      {
+        "AngNr": "1_I09",
+        "KursNr": "I09",
+        "Gebuehr": null
+      }
+    ]
+  },
+  "173": {
+    "Name": "Schulze, B.",
+    "Ort": "Krumbach",
+    "teilnahmen": [
+      {
+        "AngNr": "1_I09",
+        "KursNr": "I09",
+        "Gebuehr": 400
+      }
+    ]
+  },
+  "177": {
+    "Name": "Mons, F.",
+    "Ort": "Donauwoerth",
+    "teilnahmen": [
+      {
+        "AngNr": "2_P13",
+        "KursNr": "P13",
+        "Gebuehr": null
+      }
+    ]
+  },
+  "185": {
+    "Name": "Meier, K.",
+    "Ort": "Landsberg",
+    "teilnahmen": [
+      {
+        "AngNr": "1_I09",
+        "KursNr": "I09",
+        "Gebuehr": 450
+      }
+    ]
+  },
+  "187": {
+    "Name": "Karstens, L.",
+    "Ort": "Augsburg",
+    "teilnahmen": [
+      {
+        "AngNr": "2_I09",
+        "KursNr": "I09",
+        "Gebuehr": null
+      }
+    ]
+  },
+  "194": {
+    "Name": "Gerstner, M.",
+    "Ort": "Mindelheim",
+    "teilnahmen": [
+      {
+        "AngNr": "1_P13",
+        "KursNr": "P13",
+        "Gebuehr": null
+      }
+    ]
+  }
+}

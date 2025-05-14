@@ -36,8 +36,8 @@ async function aufgabe4() {
      * @difference-to-sql
      *  Firestore unterstützt WHERE-Filter, daher ist die Abfrage sehr ähnlich.
      */
-    const teilnehmerAusAugsburg = await db.collection('teilnehmer')
-        .where('Ort', '==', 'Augsburg').get();
+    const teilnehmerAusAugsburg =
+        await db.collection('teilnehmer').where('Ort', '==', 'Augsburg').get();
     console.log('\n👥 Teilnehmer aus Augsburg:');
     teilnehmerAusAugsburg.forEach(doc =>
         console.log(`- ${doc.data().Name}`));
@@ -64,200 +64,183 @@ async function aufgabe4() {
 
     // d) Kurstitel mit Datum und Ort
     /**
-     * @old-relational-table Angebot, Kurs
-     * @collections angebote, kurse
-     * @logic
-     * 🔸 In SQL:
-     *   SELECT k.Titel, a.Datum, a.Ort
-     *   FROM Angebot a JOIN Kurs k ON a.KursNr = k.KursNr;
-     *
-     * 🔹 In Firestore:
+     * @Firestore-Logik:
      *   - Alle Dokumente aus 'angebote' laden
-     *   - Für jedes Angebot: KursNr → passender Kurs aus 'kurse'
+     *   - Für jedes Angebot: 'KursNr' auslesen
+     *   - Passenden Kurs aus 'kurse' über KursNr als Dokument-ID nachladen
      *   - Ausgabe: kurs.Titel, angebot.Datum, angebot.Ort
      *
-     * @difference-to-sql
-     *   In SQL reicht ein JOIN. In Firestore muss jedes Kurs-Dokument separat nachgeladen werden.
+     * @SQL-Vergleich: SELECT k.Titel, a.Datum, a.Ort FROM Angebot a JOIN Kurs k ON a.KursNr = k.KursNr
+     *   - Firestore-Problem: Kein JOIN → jeder Kurs muss einzeln nachgeladen werden
      */
     console.log('\n📚 Kurstitel mit Datum und Ort:');
     const angebote = await db.collection('angebote').get();
     for (const angebotDoc of angebote.docs) {
-        const kurs = await db.collection('kurse').
-        doc(angebotDoc.data().KursNr).get();
-        console.log(`- ${kurs.data().Titel}: ${angebotDoc.data().Datum} in ${angebotDoc.data().Ort}`);
+        const angebot = angebotDoc.data();
+        const kurs =
+            await db.collection('kurse').doc(angebot.KursNr).get();
+        if (kurs.exists) {
+            console.log(`- ${kurs.data().Titel}: ${angebot.Datum} in ${angebot.Ort}`);
+        }
     }
 
     // e) Kurstitel mit Datum, Ort und Kursleiter
     /**
-     * @old-relational-table Angebot, Kurs, Fuehrt_durch, Kursleiter
-     * @collections angebote, kurse, fuehrt_durch, kursleiter
-     * @logic
-     * 🔸 In SQL:
-     *   SELECT k.Titel, a.Datum, a.Ort, l.Name
-     *   FROM Angebot a
-     *   JOIN Kurs k ON a.KursNr = k.KursNr
-     *   JOIN Fuehrt_durch f ON f.AngNr = a.AngNr AND f.KursNr = a.KursNr
-     *   JOIN Kursleiter l ON f.PersNr = l.PersNr;
+     * @Firestore-Logik:
+     *  - Alle 'angebote' durchgehen
+     *  - 'KursNr' → Titel über 'kurse' holen (wie d)
+     *  - 'kursleiter': Array mit PersNr im Angebot
+     *  - Für jede PersNr: passendes Dokument aus 'kursleiter' nachladen
      *
-     * 🔹 In Firestore:
-     *   - Angebot laden → KursNr → Titel aus 'kurse'
-     *   - Angebot.ID → passenden Eintrag aus 'fuehrt_durch'
-     *   - PersNr → Kursleiter-Dokument aus 'kursleiter'
-     *
-     * @difference-to-sql
-     *   Kein Mehrfach-JOIN wie in SQL möglich – jede Verbindung wird über separate Dokumente gelöst.
+     *  @Firestore SQL-Vergleich: JOIN mit Fuehrt_durch und Kursleiter
+     *   - Problem: Für jeden Kursleiter ein separates Read nötig
      */
     console.log('\n📚 Kurstitel mit Datum, Ort und Kursleiter:');
     for (const angebotDoc of angebote.docs) {
-        const kurs = await db.collection('kurse').
-        doc(angebotDoc.data().KursNr).get();
-        const fuehrtDurch = await db.collection('fuehrt_durch').
-        doc(angebotDoc.id).get();
-        const kursleiterDoc = await db.collection('kursleiter').
-        doc(fuehrtDurch.data().PersNr.toString()).get();
-        console.log(`- ${kurs.data().Titel}: ${angebotDoc.data().Datum}, ${angebotDoc.data().Ort}, 
-        Kursleiter: ${kursleiterDoc.data().Name}`);
+        const angebot = angebotDoc.data();
+        const kurs =
+            await db.collection('kurse').doc(angebot.KursNr).get();
+        const kursleiterSnap =
+            await db.collection('angebote').doc(angebotDoc.id).collection('kursleiter').get();
+        const kursleiterNamen = [];
+        for (const leiter of kursleiterSnap.docs) {
+            const kursleiterDoc =
+                await db.collection('kursleiter').doc(leiter.id).get();
+            if (kursleiterDoc.exists) {
+                kursleiterNamen.push(kursleiterDoc.data().Name);
+            }
+        }
+        const leiterText = kursleiterNamen.length > 0 ? kursleiterNamen.join(', ') : 'Keine Angabe';
+        console.log(`- ${kurs.data().Titel}: ${angebot.Datum}, ${angebot.Ort}, Kursleiter: ${leiterText}`);
     }
 
     // f) Kurstitel mit Voraussetzungen
     /**
-     * @old-relational-table Kurs, Vorauss
-     * @collections kurse, voraussetzungen
-     * @logic
-     * 🔸 In SQL:
-     *   SELECT k.Titel, v.VorNr FROM Kurs k LEFT JOIN Vorauss v ON k.KursNr = v.KursNr;
+     * @Firestore-Logik:
+     * - Alle Kurse aus 'kurse' laden
+     * - 'voraussetzungen': Array mit KursNr
+     * - Für jede KursNr in Voraussetzungen den Kurstitel aus 'kurse' nachladen
+     * - Wenn leer → Ausgabe „NULL“ als Text
      *
-     * 🔹 In Firestore:
-     *   - Alle Kurse laden
-     *   - Für jeden Kurs: voraussetzungen mit where('KursNr', '==', kursId)
-     *   - Für jede VorNr: Kurs nachladen, um Titel zu bekommen
-     *
-     * @difference-to-sql
-     *   Kein LEFT JOIN – Kurse ohne Voraussetzungen müssen manuell mit 'NULL' befüllt werden.
+     * @SQL-Vergleich: LEFT JOIN Vorauss v ON KursNr
+     * - Nachteil: wie vorher kein join möglich (left join)– leere Felder müssen manuell behandelt werden
      */
     console.log('\n📚 Kurstitel mit Voraussetzungen:\n');
-
-    // Schritt 1: Alle Kurse laden
     const kurseSnapshot = await db.collection('kurse').get();
     const kurseMitVoraussetzungen = [];
 
-    // Schritt 2: Voraussetzungen pro Kurs sammeln
     for (const kursDoc of kurseSnapshot.docs) {
         const kursId = kursDoc.id;
         const kursTitel = kursDoc.data().Titel;
-
         const voraussetzungenSnapshot =
-            await db.collection('voraussetzungen').where('KursNr', '==', kursId).get();
-        const vorTitelPromises = voraussetzungenSnapshot.docs.map
-        (async v => {
-            const vorKursDoc =
-                await db.collection('kurse').doc(v.data().VorNr).get();
-            return vorKursDoc.exists ? vorKursDoc.data().Titel : null;
-        });
-
-        const vorTitel = await Promise.all(vorTitelPromises);
+            await db.collection('kurse').doc(kursId).collection('voraussetzungen').get();
+        const vorausTitel = [];
+        for (const v of voraussetzungenSnapshot.docs) {
+            const vorKurs =
+                await db.collection('kurse').doc(v.id).get();
+            if (vorKurs.exists) vorausTitel.push(vorKurs.data().Titel);
+        }
         kurseMitVoraussetzungen.push({
             kursTitel,
-            vorausTitel: vorTitel.filter(Boolean)
+            vorausTitel: vorausTitel.length > 0 ? vorausTitel : ['NULL']
         });
     }
 
-    // Schritt 3: Sortieren nach Kurstitel
     kurseMitVoraussetzungen.sort((a, b) => a.kursTitel.localeCompare(b.kursTitel));
-
-    // Schritt 4: Ausgabe
     console.log('Kurs'.padEnd(40) + 'Voraussetzungen');
     console.log('-'.repeat(80));
     for (const kurs of kurseMitVoraussetzungen) {
-        const vorausText = kurs.vorausTitel.length > 0 ? kurs.vorausTitel.join(', ') : 'NULL';
+        const vorausText = kurs.vorausTitel.join(', ');
         console.log(kurs.kursTitel.padEnd(40) + vorausText);
     }
 
     // g) Teilnehmer, die einen Kurs am eigenen Wohnort gebucht haben
-        /**
-     * @old-relational-table Teilnehmer, Nimmt_teil, Angebot
-     * @collections teilnehmer, teilnahmen, angebote
-     * @logic
-     * 🔸 In SQL:
-     *   SELECT t.Name, a.Ort FROM Teilnehmer t
-     *   JOIN Nimmt_teil nt ON t.TnNr = nt.TnNr
-     *   JOIN Angebot a ON nt.AngNr = a.AngNr AND nt.KursNr = a.KursNr
-     *   WHERE t.Ort = a.Ort;
+    /**
+     * @Firestore-Logik:
+     * - Alle Teilnehmer durchgehen
+     * - Für jeden Teilnehmer: teilnahmen[] prüfen
+     * - Jede Teilnahme enthält AngNr (z. B. '1_P13')
+     * - Das passende Angebot aus 'angebote' holen → Ort vergleichen mit Teilnehmer.Ort
      *
-     * 🔹 In Firestore:
-     *   - Alle teilnahmen laden
-     *   - Für jede Teilnahme: Teilnehmer und Angebot-Dokument nachladen
-     *   - Ort vergleichen → Ausgabe bei Übereinstimmung
-     *
-     * @difference-to-sql
-     *   Kein WHERE über mehrere Tabellen möglich – Vergleich findet im Code statt.
+     * @SQL-Vergleich: JOIN Teilnehmer, Nimmt_teil, Angebot WHERE Ort übereinstimmt
+     * - Nachteil: Kein Mehrfach-JOIN → viel manuelle Verknüpfung + viele Reads
      */
     console.log('\n👥 Teilnehmer am eigenen Wohnort:');
-    const teilnahmen = await db.collection('teilnahmen').get();
-    for (const teilnahmeDoc of teilnahmen.docs) {
-        const { TnNr, AngNr, KursNr } = teilnahmeDoc.data();
-        const teilnehmer =
-            await db.collection('teilnehmer').doc(TnNr.toString()).get();
-        const angebot =
-            await db.collection('angebote').doc(`${AngNr}_${KursNr}`).get();
-        if (teilnehmer.exists && angebot.exists && teilnehmer.data().Ort === angebot.data().Ort) {
-            console.log(`- ${teilnehmer.data().Name}: ${angebot.data().Ort}`);
+    const teilnehmerSnap = await db.collection('teilnehmer').get();
+    for (const tnDoc of teilnehmerSnap.docs) {
+        const teilnehmer = tnDoc.data();
+        const teilnahmen =
+            await db.collection('teilnehmer').doc(tnDoc.id).collection('teilnahmen').get();
+        for (const teilnahme of teilnahmen.docs) {
+            const { AngNr } = teilnahme.data();
+            const angebot =
+                await db.collection('angebote').doc(`${AngNr}`).get();
+            if (angebot.exists && angebot.data().Ort === teilnehmer.Ort) {
+                console.log(`- ${teilnehmer.Name}: ${angebot.data().Ort}`);
+            }
         }
     }
 
     // h) Kursangebote ohne Teilnehmer
     /**
-     * @old-relational-table Angebot, Nimmt_teil
-     * @collections angebote, teilnahmen
-     * @logic
-     * 🔸 In SQL:
-     *   SELECT * FROM Angebot a
-     *   LEFT JOIN Nimmt_teil nt ON nt.AngNr = a.AngNr AND nt.KursNr = a.KursNr
-     *   WHERE nt.TnNr IS NULL;
+     * @Firestore-Logik:
+     *  - Alle teilnahmen[] aller Teilnehmer durchgehen → belegte AngNr sammeln (Set)
+     *  - Alle Angebote durchgehen → ID vergleichen mit Set
+     *  - Wenn nicht enthalten → anzeigen
      *
-     * 🔹 In Firestore:
-     *   - Alle teilnahmen laden → IDs kombinieren und in Set speichern
-     *   - Alle angebote prüfen → wenn ID nicht im Set → ausgeben
-     *
-     * @difference-to-sql
-     *   Kein LEFT JOIN oder NULL-Filter – muss clientseitig nachgebaut werden.
+     * @SQL-Vergleich: LEFT JOIN mit WHERE Teilnehmer IS NULL
+     *  - Nachteil: Firestore hat kein LEFT JOIN → Existenz muss manuell geprüft werden
      */
-
     console.log('\n📚 Kursangebote ohne Teilnehmer:');
-    const angebotIdsMitTeilnehmer = new Set(teilnahmen.docs.map(
-        doc => `${doc.data().AngNr}_${doc.data().KursNr}`));
-    angebote.docs.forEach(doc => {
-        if (!angebotIdsMitTeilnehmer.has(doc.id)) {
-            console.log(`- Angebot ${doc.id}`);
+    const angeboteSnap = await db.collection('angebote').get();
+    const belegteAngebote = new Set();
+    for (const tnDoc of teilnehmerSnap.docs) {
+        const teilnahmen =
+            await db.collection('teilnehmer').doc(tnDoc.id).collection('teilnahmen').get();
+        for (const teilnahme of teilnahmen.docs) {
+            const { AngNr} = teilnahme.data();
+            belegteAngebote.add(`${AngNr}`);
         }
-    });
+    }
+    for (const angebotDoc of angeboteSnap.docs) {
+        if (!belegteAngebote.has(angebotDoc.id)) {
+            const angebot = angebotDoc.data();
+            const kurs =
+                await db.collection('kurse').doc(angebot.KursNr).get();
+            console.log(`- ${kurs.exists ? kurs.data().Titel : angebot.KursNr}, Angebot ${angebotDoc.id}`);
+        }
+    }
 
     // i) Kurse mit mindestens 2 Teilnehmern
     /**
-     * @old-relational-table Nimmt_teil, Kurs
-     * @collections teilnahmen, angebote, kurse
-     * @logic
-     * 🔸 In SQL:
-     *   SELECT k.Titel, COUNT(*) FROM Nimmt_teil nt
-     *   JOIN Kurs k ON nt.KursNr = k.KursNr
-     *   GROUP BY nt.AngNr, nt.KursNr
-     *   HAVING COUNT(*) >= 2;
+     * @Firestore-Logik:
+     *   - Alle teilnahmen[] sammeln
+     *   - Jede AngNr zählen → Map[AngNr] = Anzahl
+     *   - Nur Einträge mit count ≥ 2 behalten
+     *   - Kursname über KursNr aus 'kurse' nachladen
      *
-     * 🔹 In Firestore:
-     *   - Alle teilnahmen durchlaufen → Counter-Map aufbauen pro AngNr_KursNr
-     *   - Bei ≥2 ausgeben → ggf. Titel über Angebot/Kurs nachladen
-     *
-     * @difference-to-sql
-     *   Kein GROUP BY / HAVING → Zählung erfolgt komplett im Code.
+     * @SQL-Vergleich: GROUP BY + HAVING COUNT(*) >= 2
+     *   - Nachteil: Keine Aggregation in Firestore → Zählen muss manuell erfolgen
      */
     console.log('\n📚 Kurse mit mind. 2 Teilnehmern:');
-    const teilnehmerCounter = {};
-    teilnahmen.forEach(doc => {
-        const key = `${doc.data().AngNr}_${doc.data().KursNr}`;
-        teilnehmerCounter[key] = (teilnehmerCounter[key] || 0) + 1;
-    });
-    for (const [key, count] of Object.entries(teilnehmerCounter)) {
-        if (count >= 2) console.log(`- Angebot ${key}: ${count} Teilnehmer`);
+    const teilnahmeCounter = {};
+    for (const tnDoc of teilnehmerSnap.docs) {
+        const teilnahmen =
+            await db.collection('teilnehmer').doc(tnDoc.id).collection('teilnahmen').get();
+        for (const teilnahme of teilnahmen.docs) {
+            const { AngNr} = teilnahme.data();
+            const key = `${AngNr}`;
+            teilnahmeCounter[key] = (teilnahmeCounter[key] || 0) + 1;
+        }
+    }
+    for (const [angebotId, count] of Object.entries(teilnahmeCounter)) {
+        if (count >= 2) {
+            const angebot =
+                await db.collection('angebote').doc(angebotId).get();
+            const kurs =
+                await db.collection('kurse').doc(angebot.data().KursNr).get();
+            console.log(`- ${kurs.exists ? kurs.data().Titel : angebot.data().KursNr}: ${count} Teilnehmer`);
+        }
     }
 
     // j) Alle Meier
@@ -273,24 +256,26 @@ async function aufgabe4() {
      *          - teilnehmer: Name >= 'Meier' und Name <= 'Meier\uf8ff'
      *          - kursleiter: Name >= 'Meier' und Name <= 'Meier\uf8ff'
      * @difference-to-sql
-     *   In SQL können Daten aus mehreren Tabellen mit UNION kombiniert werden. In Firestore
-     *   kann jede Read-Operation nur auf eine Collection angewendet werden, daher
-     *   werden zwei separate Abfragen durchgeführt.
+     *   In SQL können Daten aus mehreren Tabellen mit UNION kombiniert werden. In Firestore kann jede
+     *   Read-Operation nur auf eine Collection angewendet werden, daher werden zwei separate Abfragen durchgeführt.
      */
     console.log('\n👥 Alle Meier:');
-    const meierTeilnehmer = await db.collection('teilnehmer').
-    where('Name', '>=', 'Meier').where('Name', '<=', 'Meier\uf8ff').get();
-    meierTeilnehmer.forEach(doc =>
+    const teilnehmerMeier = await db.collection('teilnehmer')
+        .where('Name', '>=', 'Meier')
+        .where('Name', '<=', 'Meier\uf8ff').get();
+    teilnehmerMeier.forEach(doc =>
         console.log(`- Teilnehmer: ${doc.data().Name}`));
-    const meierKursleiter = await db.collection('kursleiter').
-    where('Name', '>=', 'Meier').where('Name', '<=', 'Meier\uf8ff').get();
-    meierKursleiter.forEach(doc =>
+    const kursleiterMeier =
+        await db.collection('kursleiter')
+        .where('Name', '>=', 'Meier')
+        .where('Name', '<=', 'Meier\uf8ff').get();
+    kursleiterMeier.forEach(doc =>
         console.log(`- Kursleiter: ${doc.data().Name}`));
 
-    // k. Kurstitel mit Anzahl der Angebote
+    // k) Kurstitel mit Anzahl der Angebote
     /**
-     * @old-relational-table Teilnehmer, Kursleiter
-     * @collections teilnehmer, Kursleiter
+     * @old-relational-table Kurs, Angebot
+     * @collections kurse, angebote
      * @logic
      *   🔸 In SQL:
      *       SELECT k.titel, COUNT(a.id) AS angebote_count FROM Kurs k LEFT JOIN Angebot a ON k.KursNr = a.KursNr
@@ -299,19 +284,19 @@ async function aufgabe4() {
      *       Erst alle Kurse laden, dann für jeden Kurs alle Angebote laden und zählen. Alternative wäre zusätzliches
      *       Attribut in der Kurse-Collection zu speichern und dieses über Trigger zu aktualisieren.
      * @difference-to-sql
-     *   Firestore unterstützt weder JOINS noch Aggreagationen wie COUNT, daher muss manuell
+     *   Firestore untersützt weder JOINS noch Aggreagationen wie COUNT. Daher muss manuell
      *   iteriert und gezählt werden.
      */
     console.log('\n📚 Kurstitel mit Anzahl der Angebote:');
-    const kurseSnapshotAll = await db.collection('kurse').get();
-    for (const kursDoc of kurseSnapshotAll.docs) {
+    const kurseSnap = await db.collection('kurse').get();
+    for (const kursDoc of kurseSnap.docs) {
         const kursId = kursDoc.id;
         const angeboteCount = (await db.collection('angebote').
         where('KursNr', '==', kursId).get()).size;
         console.log(`- ${kursDoc.data().Titel}: ${angeboteCount} Angebote`);
     }
 
-    // l. Kurstitel mit Anzahl der Voraussetzungen (mind. 2 Voraussetzungen)
+    // l) Kurstitel mit Anzahl der Voraussetzungen (mind. 2)
     /**
      * @old-relational-table Vorauss, Kurs
      * @collections voraussetzungen, kurse
@@ -320,75 +305,67 @@ async function aufgabe4() {
      *       SELECT k.titel FROM Kurs k JOIN Vorauss v ON k.KursNr = v.KursNr GROUP BY k.KursNr,
      *       k.Titel HAVING COUNT(v.VorNr) >= 2;
      *   🔹 In Firestore:
-     *       Erst alle Voraussetzungen laden und zählen pro Kurs. Dann die Kurse mit mindestens
-     *       2 Voraussetzungen laden.
+     *       Erst Kurse laden, dann je Kurs die Subcollection "voraussetzungen" laden und zählen.
      * @difference-to-sql
      *   Firestore unterstützt weder JOINS noch Aggreagationen wie COUNT, daher muss manuell
      *   iteriert und gezählt werden.
      */
     console.log('\n📚 Kurstitel mit mindestens 2 Voraussetzungen:');
-    const voraussetzungenSnapshotAll =
-        await db.collection('voraussetzungen').get();
-    const voraussetzungCounter = {};
-    voraussetzungenSnapshotAll.docs.forEach(doc => {
-        const kursNr = doc.data().KursNr;
-        voraussetzungCounter[kursNr] = (voraussetzungCounter[kursNr] || 0) + 1;
-    });
-    const sortedVoraussetzungen = Object.entries(voraussetzungCounter)
-        .filter(([_, count]) => count >= 2)
-        .sort((a, b) => b[1] - a[1]);
-    for (const [kursNr, count] of sortedVoraussetzungen) {
-        const kurs =
-            await db.collection('kurse').doc(kursNr).get();
-        console.log(`- ${kurs.data().Titel}: ${count} Voraussetzungen`);
-    }
-
-    // m. Durchschnittliches Gehalt der Kursleiter pro Kurs
-    /**
-     * @old-relational-table Kursleiter, Fuehrt_Durch, Kurs
-     * @collections kursleiter, fuehrt_durch, kurse
-     * @logic
-     *   🔸 In SQL: SELECT k.Titel, AVG(kl.Gehalt) FROM Kurs k JOIN Fuehrt_Durch fd ON k.KursNr =
-     *   fd.KursNr JOIN Kursleiter kl ON fd.PersNr = kl.PersNr GROUP BY k.KursNr, k.Titel;
-     *   🔹 In Firestore:
-     *       Alle Dokumente aus fuehrt_durch laden. Für jeden Eintrag das Kursleiter-Gehalt summieren und zählen.
-     *       Danach pro Kurs den Durchschnitt berechnen und Kurstitel nachladen.
-     * @difference-to-sql
-     *   Kein direktes JOIN oder AVG in Firestore – manuelles Sammeln, Aggregieren und Zuordnen erforderlich.
-     */
-    console.log('\n📚 Durchschnittliches Gehalt der Kursleiter pro Kurs:');
-    const kursGehalt = {};
-    const fuehrtDurchSnapshot =
-        await db.collection('fuehrt_durch').get();
-    for (const fdDoc of fuehrtDurchSnapshot.docs) {
-        const { KursNr, PersNr } = fdDoc.data();
-        const kursleiterDoc =
-            await db.collection('kursleiter').doc(PersNr.toString()).get();
-        if (kursleiterDoc.exists) {
-            const gehalt = kursleiterDoc.data().Gehalt;
-            if (!kursGehalt[KursNr]) kursGehalt[KursNr] = { sum: 0, count: 0 };
-            kursGehalt[KursNr].sum += gehalt;
-            kursGehalt[KursNr].count += 1;
+    const vorausList = [];  // ← hier wird die Liste korrekt initialisiert
+    for (const kursDoc of kurseSnap.docs) {
+        const vorausSnap = await db.collection('kurse').
+        doc(kursDoc.id).collection('voraussetzungen').get();
+        if (vorausSnap.size >= 2) {
+            vorausList.push({ titel: kursDoc.data().Titel, count: vorausSnap.size });
         }
     }
-    const gehaltDurchschnittArray = [];
-    for (const [kursNr, { sum, count }] of Object.entries(kursGehalt)) {
-        gehaltDurchschnittArray.push({
-            kursNr,
-            durchschnitt: (sum / count).toFixed(2)
-        });
-    }
-    gehaltDurchschnittArray.sort((a, b) => a.durchschnitt - b.durchschnitt);
-    for (const { kursNr, durchschnitt } of gehaltDurchschnittArray) {
-        const kurs =
-            await db.collection('kurse').doc(kursNr).get();
-        console.log(`- ${kurs.data().Titel}: Durchschnittliches Gehalt ${durchschnitt}€`);
-    }
+    vorausList.sort((a, b) => b.count - a.count);
+    vorausList.forEach(k => console.log(`- ${k.titel}: ${k.count} Voraussetzungen`));
 
-    // n. Alle Paare von Kursleitern, die denselben Kurs halten
+
+    // m) Durchschnittliches Gehalt der Kursleiter pro Kurs
     /**
-     * @old-relational-table Kursleiter, Fuehrt_Durch, Kurs
-     * @collections kursleiter, fuehrt_durch, kurse
+     * @alt-structure kurse > angebote > kursleiter (Subcollection)
+     * @collections kurse, angebote, kursleiter
+     * @logic
+     *   🔸 In SQL: SELECT k.Titel, AVG(kl.Gehalt) FROM Kurs k JOIN Fuehrt_Durch fd ON k.KursNr = fd.KursNr
+     *   JOIN Kursleiter kl ON fd.PersNr = kl.PersNr GROUP BY k.KursNr, k.Titel;
+     *   🔹 In Firestore:
+     *       Für jeden Kurs alle zugehörigen Angebote abfragen.
+     *       Für jedes Angebot die Subcollection `kursleiter` durchgehen und deren Gehälter aufsummieren.
+     *       Danach Durchschnitt berechnen und sortiert ausgeben.
+     * @difference-to-sql
+     *   Kein JOIN oder AVG vorhanden – die geschachtelte Struktur erfordert rekursives
+     *   Traversieren über mehrere Ebenen.
+     */
+    console.log('\n📚 Durchschnittliches Gehalt der Kursleiter pro Kurs:');
+    const kursGehaelter = [];
+    for (const kursDoc of kurseSnap.docs) {
+        const kursId = kursDoc.id;
+        const angebote = await db.collection('angebote').
+        where('KursNr', '==', kursId).get();
+        const gehaltSum = [];
+        for (const angebot of angebote.docs) {
+            const leiterSnap = await db.collection('angebote').
+            doc(angebot.id).collection('kursleiter').get();
+            for (const leiter of leiterSnap.docs) {
+                const leiterDoc =
+                    await db.collection('kursleiter').doc(leiter.id).get();
+                if (leiterDoc.exists) gehaltSum.push(leiterDoc.data().Gehalt);
+            }
+        }
+        if (gehaltSum.length > 0) {
+            const avg = gehaltSum.reduce((a, b) => a + b, 0) / gehaltSum.length;
+            kursGehaelter.push({ titel: kursDoc.data().Titel, durchschnitt: avg });
+        }
+    }
+    kursGehaelter.sort((a, b) => b.durchschnitt - a.durchschnitt);
+    kursGehaelter.forEach(e => console.log(`- ${e.titel}: ${e.durchschnitt.toFixed(2)} €`));
+
+    // n) Kursleiter-Paare, die denselben Kurs halten
+    /**
+     * @alt-structure angebote > kursleiter (Subcollection), angebote referenzieren KursNr
+     * @collections angebote, kursleiter, kurse
      * @logic
      *   🔸 In SQL:
      *       SELECT kl1.Name, kl2.Name, k.Titel
@@ -398,32 +375,37 @@ async function aufgabe4() {
      *       JOIN Kursleiter kl2 ON fd2.PersNr = kl2.PersNr
      *       JOIN Kurs k ON fd1.KursNr = k.KursNr;
      *   🔹 In Firestore:
-     *       Alle fuehrt_durch-Einträge laden. Pro Kurs eine Set-Liste aller Leiter aufbauen.
-     *       Für Kurse mit mehr als einem Leiter alle eindeutigen Paare bilden und deren Namen + Kurstitel nachladen.
+     *       Alle Angebote laden und die `kursleiter`-Subcollections durchgehen.
+     *       Für jede KursNr eine Liste von Leitern aufbauen.
+     *       Wenn mindestens zwei vorhanden sind, alle eindeutigen Paare bilden und ihre Namen + Kurstitel ausgeben.
      * @difference-to-sql
-     *   Kein Self-Join in Firestore möglich. Paare müssen clientseitig gebildet und nacheinander aufgelöst werden.
+     *   Kein Self-Join möglich – Paare müssen manuell im Client konstruiert werden.
+     *   Subcollections pro Angebot erhöhen die Tiefe der Traversierung.
      */
-    console.log('\n👩‍🏫 Paare von Kursleitern, die denselben Kurs halten:');
-    const kursAngeboteLeiter = {};
-    fuehrtDurchSnapshot.docs.forEach(doc => {
-        const { KursNr, PersNr } = doc.data();
-        if (!kursAngeboteLeiter[KursNr]) kursAngeboteLeiter[KursNr] = new Set();
-        kursAngeboteLeiter[KursNr].add(PersNr);
-    });
-    for (const [kursNr, leiterSet] of Object.entries(kursAngeboteLeiter)) {
-        const leiterArray = Array.from(leiterSet);
-        if (leiterArray.length > 1) {
-            const kurs =
-                await db.collection('kurse').doc(kursNr).get();
-            for (let i = 0; i < leiterArray.length - 1; i++) {
-                for (let j = i + 1; j < leiterArray.length; j++) {
-                    const leiter1 =
-                        await db.collection('kursleiter').doc(leiterArray[i].toString()).get();
-                    const leiter2 =
-                        await db.collection('kursleiter').doc(leiterArray[j].toString()).get();
-                    if (leiter1.exists && leiter2.exists) {
-                        console.log(`- ${kurs.data().Titel}: ${leiter1.data().Name} & ${leiter2.data().Name}`);
-                    }
+    console.log('\n👩‍🏫 Kursleiter-Paare für denselben Kurs:');
+    const kursLeiterMap = {};
+    const angeboteSnapAll = await db.collection('angebote').get();
+    for (const angebotDoc of angeboteSnapAll.docs) {
+        const angebot = angebotDoc.data();
+        if (!kursLeiterMap[angebot.KursNr]) kursLeiterMap[angebot.KursNr] = new Set();
+        const leiterSnap =
+            await db.collection('angebote').doc(angebotDoc.id).collection('kursleiter').get();
+        leiterSnap.docs.forEach(d =>
+            kursLeiterMap[angebot.KursNr].add(d.id));
+    }
+    for (const [kursNr, leiterSet] of Object.entries(kursLeiterMap)) {
+        const leiter = Array.from(leiterSet);
+        if (leiter.length < 2) continue;
+        const kurs =
+            await db.collection('kurse').doc(kursNr).get();
+        for (let i = 0; i < leiter.length - 1; i++) {
+            for (let j = i + 1; j < leiter.length; j++) {
+                const l1 =
+                    await db.collection('kursleiter').doc(leiter[i]).get();
+                const l2 =
+                    await db.collection('kursleiter').doc(leiter[j]).get();
+                if (l1.exists && l2.exists) {
+                    console.log(`- ${kurs.data().Titel}: ${l1.data().Name} & ${l2.data().Name}`);
                 }
             }
         }

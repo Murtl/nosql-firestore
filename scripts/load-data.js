@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { Firestore } from '@google-cloud/firestore';
 
+// Emulator-Verbindung setzen
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 
 const db = new Firestore({
@@ -8,8 +9,13 @@ const db = new Firestore({
     ssl: false
 });
 
-async function load(collectionName, filePath, idGenerator) {
-    console.log(`📄 Lade Datei: ${filePath}`);
+/**
+ * Lädt ein JSON-Objekt in eine Collection mit der gegebenen ID-Struktur.
+ * @param {string} collectionName - Name der Haupt-Collection in Firestore
+ * @param {string} filePath - Pfad zur JSON-Datei
+ */
+async function loadStructuredData(collectionName, filePath) {
+    console.log(`📄 Lade ${collectionName} aus Datei: ${filePath}`);
 
     if (!fs.existsSync(filePath)) {
         console.error(`❌ Datei nicht gefunden: ${filePath}`);
@@ -20,93 +26,75 @@ async function load(collectionName, filePath, idGenerator) {
         const raw = fs.readFileSync(filePath, 'utf-8');
         const data = JSON.parse(raw);
 
-        for (const entry of data) {
-            const id = idGenerator(entry);
+        for (const id of Object.keys(data)) {
+            const document = data[id];
             console.log(`📄 Schreibe ${collectionName}/${id}...`);
-            await db.collection(collectionName).doc(id).set(entry);
+
+            // Schreibe das Hauptdokument
+            const docRef = db.collection(collectionName).doc(id);
+            const { teilnahmen, kursliteratur, voraussetzungen, kursleiter, ...mainData } = document;
+            await docRef.set(mainData);
+
+            // Falls eingebettete Subcollections vorhanden sind
+            if (teilnahmen) {
+                for (const [index, t] of teilnahmen.entries()) {
+                    await docRef.collection('teilnahmen').doc(`teilnahme_${index}`).set(t);
+                }
+            }
+
+            if (kursliteratur && Object.keys(kursliteratur).length > 0) {
+                await docRef.collection('kursliteratur').doc('standard').set(kursliteratur);
+            }
+
+            if (voraussetzungen && voraussetzungen.length > 0) {
+                for (const v of voraussetzungen) {
+                    await docRef.collection('voraussetzungen').doc(v).set({ Voraussetzung: v });
+                }
+            }
+
+            if (kursleiter && kursleiter.length > 0) {
+                for (const pid of kursleiter) {
+                    await docRef.collection('kursleiter').doc(pid.toString()).set({ PersNr: pid });
+                }
+            }
+
             console.log(`✅ ${collectionName}/${id} gespeichert`);
         }
 
     } catch (err) {
-        console.error(`❌ Fehler bei ${collectionName}:`, err.message);
+        console.error(`❌ Fehler beim Laden von ${collectionName}:`, err.message);
         console.error(err.stack);
     }
 }
 
 async function main() {
-    console.log("📁 Lade Daten...");
+    console.log("🚀 Starte Datenimport in Firestore...");
 
     /**
-     * @old-relational-table Kurs
-     * @table kurse
-     * @id Für die Kurse-Tabelle wird die KursNr als ID verwendet
+     * Hauptcollection: kurse
+     * Struktur: beinhaltet kursliteratur & voraussetzungen als Subcollections
      */
-    await load('kurse', '../data/kurse.json', (e) => e.KursNr);
+    await loadStructuredData('kurse', '../data/kurse.json');
 
     /**
-     * @old-relational-table Teilnehmer
-     * @table teilnehmer
-     * @id Für die Teilnehmer-Tabelle wird die TnNr als ID verwendet
+     * Hauptcollection: teilnehmer
+     * Struktur: beinhaltet teilnahmen (mit Gebühr) als Subcollection
      */
-    await load('teilnehmer', '../data/teilnehmer.json', (e) => e.TnNr.toString());
+    await loadStructuredData('teilnehmer', '../data/teilnehmer.json');
 
     /**
-     * @old-relational-table Angebot
-     * @table angebote
-     * @id Für die Angebote-Tabelle wird die Kombination aus AngNr und KursNr als ID verwendet
+     * Hauptcollection: angebote
+     * Struktur: beinhaltet kursleiter als Subcollection
      */
-    await load('angebote', '../data/angebote.json', (e) => `${e.AngNr}_${e.KursNr}`);
+    await loadStructuredData('angebote', '../data/angebote.json');
 
     /**
-     * @old-relational-table Kursleiter
-     * @table kursleiter
-     * @id Für die Kursleiter-Tabelle wird die PersNr als ID verwendet
+     * Hauptcollection: kursleiter
+     * Struktur: flache Struktur ohne Subcollections
      */
-    await load('kursleiter', '../data/kursleiter.json', (e) => e.PersNr.toString());
+    await loadStructuredData('kursleiter', '../data/kursleiter.json');
 
-    /**
-     * @old-relational-table Vorauss
-     * @table voraussetzungen
-     * @id Für die voraussetzungen-Tabelle wird die Kombination aus VorNr und KursNr als ID verwendet
-     * @note Könnte man als direkte Subcollection unter kurse/KursNr anlegen.
-     */
-    await load('voraussetzungen', '../data/voraussetzungen.json', (e) => `${e.VorNr}_${e.KursNr}`);
-
-    /**
-     * @old-relational-table Nimmt_teil
-     * @table teilnahmen
-     * @id Für die Teilnahmen-Tabelle wird die Kombination aus AngNr, KursNr und TnNr als ID verwendet
-     * @note Könnte man als direkte Subcollection unter teilnehmer/TnNr anlegen.
-     */
-    await load('teilnahmen', '../data/teilnahmen.json', (e) => `${e.AngNr}_${e.KursNr}_${e.TnNr}`);
-
-    /**
-     * @old-relational-table Fuehrt_durch
-     * @table fuehrt_durch
-     * @id Für die fuehrt_durch-Tabelle wird die Kombination aus AngNr und KursNr als ID verwendet
-     * @note Da ein Kursangebot nur einen Kursleiter hat, ist die Zusammensetzung aus AngNr und KursNr ausreichend.
-     * Sobald es aber mehrere Kursleiter für ein Angebot gibt, muss die PersNr auch in die ID aufgenommen werden.
-     * @note2 Könnte man als direkte Subcollection unter angebote/AngNr_KursNr anlegen.
-     */
-    await load('fuehrt_durch', '../data/fuehrt_durch.json', (e) => `${e.AngNr}_${e.KursNr}`);
-
-    /**
-     * @old-relational-table Gebuehren
-     * @table gebuehren
-     * @id Für die gebuehren-Tabelle wird die Kombination aus AngNr, KursNr und TnNr als ID verwendet
-     * @note Könnte man als direkte Subcollection unter teilnahmen/AngNr_KursNr anlegen.
-     */
-    await load('gebuehren', '../data/gebuehren.json', (e) => `${e.AngNr}_${e.KursNr}_${e.TnNr}`);
-
-    /**
-     * @old-relational-table KursLit
-     * @table kursliteratur
-     * @id Für die kursliteratur-Tabelle wird die KursNr als ID verwendet
-     * @note Könnte man als direkte Subcollection unter kurse/KursNr anlegen.
-     */
-    await load('kursliteratur', '../data/kursliteratur.json', (e) => e.KursNr);
-
-    console.log("✅ Fertig.");
+    console.log("✅ Alle Daten erfolgreich geladen.");
 }
 
 await main();

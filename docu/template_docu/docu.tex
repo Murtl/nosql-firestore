@@ -1,0 +1,141 @@
+%%% ---------------------------------------------------------------------------------
+%%% Vorlage Abschlussarbeit (LaTeX)
+%%% 
+%%% V1   03/2017, Stefan Etschberger (HSA)
+%%% V1.1 04/2021, rnw-hack für biblatex-run
+%%% V2   05/2021, Titelblatt und Erweiterungen: Stefan Jansen (HSA)
+%%% V2.1 05/2021, Trennung von R-Support und einfachem LaTeX: Phillip Heidegger (HSA)
+%%% V2.2 01/2024, Anpassung an THA-Layout
+%%% V3   01/2024, I18n
+%%% V3.1 10/2024, Phillip Heideger, Online Version präferiert, Reparatur langes Inhaltsverzeichnis,
+%%%               Erklärung Referenzen, blau für Refs & Links
+%%% ---------------------------------------------------------------------------------
+\documentclass[12pt,a4paper%
+              ,oneside     % fuer PDF-Abgabe, bei Druck twoside
+              ,titlepage
+              ,DIV=13
+              ,headinclude
+              ,footinclude=false%
+              ,cleardoublepage=empty%
+              ,parskip=half,
+              BCOR=0mm,
+              ]{scrreprt}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage[authorName={}
+           ,authorEnrolmentNo={}
+           ,authorStreet={}
+           ,authorZip={}
+           ,authorCity={}
+           ,authorEMail={}
+           ,authorPhone= {}
+           ,authorSignaturePlace={}
+           ,studyProgram={Mathematik}
+           ,thesisType={Dokumentation}
+           ,thesisTitle={NoSQL: Umsetzung der Semesteraufgabe mit Google Firestore}
+           ,studyDegree=%
+%                        {{Bachelor of Arts}}
+%                        {{Bachelor of Engeneering}}
+                        {{Bachelor of Science (B.\,Sc.)}}
+%                        {{Master of Arts}}
+%                        {{Master of Engeneering}}
+%                        {{Master of Science (M.\,Sc.)}}
+           ,faculty=% 
+%                     {{Fakultät für \\ Angewandte \\ Geistes-  und  \\ Naturwissenschaften}}
+%                     {{Fakultät für \\ Architektur und \\ Bauwesen}}
+%                     {{Fakultät für \\ Elektrotechnik}}
+%                     {{Fakultät für \\ Gestaltung}}
+                      {{Fakultät für \\ Informatik}}
+%                     {{Fakultät für \\ Maschinenbau und \\ Verfahrenstechnik}}, showDiesel=true
+%                     {{Fakultät für \\ Wirtschaft}}
+%           ,topicAssignment={\today}
+%           ,submissionDate={\today}
+%           ,defenseDate={\today}
+%           ,nonDisclosure={false}
+           ,supervisor={Prof.~Dr.~Frank N. Stein}
+%           ,supervisorDeputy={Prof.~Dr.~Mario Huana}
+%           ,language={en}
+           ]{THA-docu}
+
+% ====== mögliches Setup fürs PDFs =======
+\hypersetup{
+  colorlinks=true,
+  allcolors = THAi-Blue, % oder THAred ??
+  linktocpage  
+}
+% Siehe:
+% https://ctan.net/macros/latex/contrib/hyperref/doc/hyperref-doc.pdf
+% S. Kap. 5, S. 10 ff
+
+% Ohne diese Zeile: Mit klickbaren links
+% \hypersetup{draft}
+
+
+% Literaturdatenbank (.bib-Datei) aus Citavi o.ä.
+\bibliography{Literatur_docu}
+
+\graphicspath{{Bilder/}}
+
+\usepackage{caption}
+\DeclareCaptionLabelFormat{something}{#2.#1.}
+\captionsetup[lstlisting]{labelformat=something}
+
+\begin{document}
+
+% Sprachauswahl zum Umschalten innerhalb des Textes. 
+% Alternativen: \thesisLanguage, ngerman, english
+\selectlanguage{\thesisLanguage}
+
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\THAtitlepage
+
+\tableofcontents
+
+%%% --------------------------------------------------
+%%% Ab hier: Inhalt
+%%% --------------------------------------------------
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\chapter{Ausgangssituation}
+\chapter{No-SQL Datenbank Entscheidung}
+\chapter{Firestore-Emulator Aufsetzung}
+\chapter{Abfragensprache-Entscheidung}
+\chapter{Typsicherheit mit TypeScript}
+\chapter{Ansatz-Struktur-Entscheidung}
+\chapter{Herausforderungen bei den Read-Abfragen}
+\chapter{Herausforderungen bei den Update-Abfragen}
+\chapter{Herausforderungen bei den Delete-Abfragen}
+\chapter{Fazit}
+
+
+\appendix
+
+% Selbständigkeitserklärung
+%\AuthorDeclaration
+
+
+%\listoffigures % Abbildungsverzeichnis
+%\listoftables % Tabellenverzeichnis
+
+% --------------------------------------------------
+% Bibliographie
+% --------------------------------------------------
+\renewcommand{\bibfont}{\footnotesize}
+\printbibliography[title={Literaturverzeichnis}, 
+                   heading=bibintoc]
+
+
+% --------------------------------------------------
+% Index
+% --------------------------------------------------
+{\setkomafont{section}{\Huge} % temporarily set chapter font
+\printindex
+}
+
+\end{document}

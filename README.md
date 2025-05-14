@@ -46,8 +46,8 @@ Umsetzung der Semesteraufgabe im Wahlfach NoSQL mit Firestore (lokal) im SoSe25
   ```bash
     node load-data.js 
     ```
-- `scripts/query-examples.js` - Beispiel für das Auslesen von Daten mit Bedingungen aus der Firestore-DB
+- `scripts/read-data.js` - Beispiel für das Auslesen von Daten mit Bedingungen aus der Firestore-DB
   ```bash
-    node query-examples.js 
+    node read-data.js 
   ```
   
