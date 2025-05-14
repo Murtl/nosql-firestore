@@ -62,6 +62,7 @@ async function aufgabe4() {
     kursleiter.forEach(doc =>
         console.log(`- ${doc.data().Name}: ${doc.data().Gehalt}€`));
 
+    // d) Kurstitel mit Datum und Ort
     /**
      * @old-relational-table Angebot, Kurs
      * @collections angebote, kurse
@@ -78,8 +79,6 @@ async function aufgabe4() {
      * @difference-to-sql
      *   In SQL reicht ein JOIN. In Firestore muss jedes Kurs-Dokument separat nachgeladen werden.
      */
-
-    // d) Kurstitel mit Datum und Ort
     console.log('\n📚 Kurstitel mit Datum und Ort:');
     const angebote = await db.collection('angebote').get();
     for (const angebotDoc of angebote.docs) {
@@ -89,6 +88,25 @@ async function aufgabe4() {
     }
 
     // e) Kurstitel mit Datum, Ort und Kursleiter
+    /**
+     * @old-relational-table Angebot, Kurs, Fuehrt_durch, Kursleiter
+     * @collections angebote, kurse, fuehrt_durch, kursleiter
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT k.Titel, a.Datum, a.Ort, l.Name
+     *   FROM Angebot a
+     *   JOIN Kurs k ON a.KursNr = k.KursNr
+     *   JOIN Fuehrt_durch f ON f.AngNr = a.AngNr AND f.KursNr = a.KursNr
+     *   JOIN Kursleiter l ON f.PersNr = l.PersNr;
+     *
+     * 🔹 In Firestore:
+     *   - Angebot laden → KursNr → Titel aus 'kurse'
+     *   - Angebot.ID → passenden Eintrag aus 'fuehrt_durch'
+     *   - PersNr → Kursleiter-Dokument aus 'kursleiter'
+     *
+     * @difference-to-sql
+     *   Kein Mehrfach-JOIN wie in SQL möglich – jede Verbindung wird über separate Dokumente gelöst.
+     */
     console.log('\n📚 Kurstitel mit Datum, Ort und Kursleiter:');
     for (const angebotDoc of angebote.docs) {
         const kurs = await db.collection('kurse').
@@ -102,6 +120,21 @@ async function aufgabe4() {
     }
 
     // f) Kurstitel mit Voraussetzungen
+    /**
+     * @old-relational-table Kurs, Vorauss
+     * @collections kurse, voraussetzungen
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT k.Titel, v.VorNr FROM Kurs k LEFT JOIN Vorauss v ON k.KursNr = v.KursNr;
+     *
+     * 🔹 In Firestore:
+     *   - Alle Kurse laden
+     *   - Für jeden Kurs: voraussetzungen mit where('KursNr', '==', kursId)
+     *   - Für jede VorNr: Kurs nachladen, um Titel zu bekommen
+     *
+     * @difference-to-sql
+     *   Kein LEFT JOIN – Kurse ohne Voraussetzungen müssen manuell mit 'NULL' befüllt werden.
+     */
     console.log('\n📚 Kurstitel mit Voraussetzungen:\n');
 
     // Schritt 1: Alle Kurse laden
@@ -159,7 +192,6 @@ async function aufgabe4() {
      * @difference-to-sql
      *   Kein WHERE über mehrere Tabellen möglich – Vergleich findet im Code statt.
      */
-
     console.log('\n👥 Teilnehmer am eigenen Wohnort:');
     const teilnahmen = await db.collection('teilnahmen').get();
     for (const teilnahmeDoc of teilnahmen.docs) {
@@ -201,6 +233,23 @@ async function aufgabe4() {
     });
 
     // i) Kurse mit mindestens 2 Teilnehmern
+    /**
+     * @old-relational-table Nimmt_teil, Kurs
+     * @collections teilnahmen, angebote, kurse
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT k.Titel, COUNT(*) FROM Nimmt_teil nt
+     *   JOIN Kurs k ON nt.KursNr = k.KursNr
+     *   GROUP BY nt.AngNr, nt.KursNr
+     *   HAVING COUNT(*) >= 2;
+     *
+     * 🔹 In Firestore:
+     *   - Alle teilnahmen durchlaufen → Counter-Map aufbauen pro AngNr_KursNr
+     *   - Bei ≥2 ausgeben → ggf. Titel über Angebot/Kurs nachladen
+     *
+     * @difference-to-sql
+     *   Kein GROUP BY / HAVING → Zählung erfolgt komplett im Code.
+     */
     console.log('\n📚 Kurse mit mind. 2 Teilnehmern:');
     const teilnehmerCounter = {};
     teilnahmen.forEach(doc => {
