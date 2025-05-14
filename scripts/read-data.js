@@ -62,6 +62,23 @@ async function aufgabe4() {
     kursleiter.forEach(doc =>
         console.log(`- ${doc.data().Name}: ${doc.data().Gehalt}€`));
 
+    /**
+     * @old-relational-table Angebot, Kurs
+     * @collections angebote, kurse
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT k.Titel, a.Datum, a.Ort
+     *   FROM Angebot a JOIN Kurs k ON a.KursNr = k.KursNr;
+     *
+     * 🔹 In Firestore:
+     *   - Alle Dokumente aus 'angebote' laden
+     *   - Für jedes Angebot: KursNr → passender Kurs aus 'kurse'
+     *   - Ausgabe: kurs.Titel, angebot.Datum, angebot.Ort
+     *
+     * @difference-to-sql
+     *   In SQL reicht ein JOIN. In Firestore muss jedes Kurs-Dokument separat nachgeladen werden.
+     */
+
     // d) Kurstitel mit Datum und Ort
     console.log('\n📚 Kurstitel mit Datum und Ort:');
     const angebote = await db.collection('angebote').get();
@@ -124,6 +141,25 @@ async function aufgabe4() {
     }
 
     // g) Teilnehmer, die einen Kurs am eigenen Wohnort gebucht haben
+        /**
+     * @old-relational-table Teilnehmer, Nimmt_teil, Angebot
+     * @collections teilnehmer, teilnahmen, angebote
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT t.Name, a.Ort FROM Teilnehmer t
+     *   JOIN Nimmt_teil nt ON t.TnNr = nt.TnNr
+     *   JOIN Angebot a ON nt.AngNr = a.AngNr AND nt.KursNr = a.KursNr
+     *   WHERE t.Ort = a.Ort;
+     *
+     * 🔹 In Firestore:
+     *   - Alle teilnahmen laden
+     *   - Für jede Teilnahme: Teilnehmer und Angebot-Dokument nachladen
+     *   - Ort vergleichen → Ausgabe bei Übereinstimmung
+     *
+     * @difference-to-sql
+     *   Kein WHERE über mehrere Tabellen möglich – Vergleich findet im Code statt.
+     */
+
     console.log('\n👥 Teilnehmer am eigenen Wohnort:');
     const teilnahmen = await db.collection('teilnahmen').get();
     for (const teilnahmeDoc of teilnahmen.docs) {
@@ -138,6 +174,23 @@ async function aufgabe4() {
     }
 
     // h) Kursangebote ohne Teilnehmer
+    /**
+     * @old-relational-table Angebot, Nimmt_teil
+     * @collections angebote, teilnahmen
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT * FROM Angebot a
+     *   LEFT JOIN Nimmt_teil nt ON nt.AngNr = a.AngNr AND nt.KursNr = a.KursNr
+     *   WHERE nt.TnNr IS NULL;
+     *
+     * 🔹 In Firestore:
+     *   - Alle teilnahmen laden → IDs kombinieren und in Set speichern
+     *   - Alle angebote prüfen → wenn ID nicht im Set → ausgeben
+     *
+     * @difference-to-sql
+     *   Kein LEFT JOIN oder NULL-Filter – muss clientseitig nachgebaut werden.
+     */
+
     console.log('\n📚 Kursangebote ohne Teilnehmer:');
     const angebotIdsMitTeilnehmer = new Set(teilnahmen.docs.map(
         doc => `${doc.data().AngNr}_${doc.data().KursNr}`));
