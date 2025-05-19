@@ -109,6 +109,22 @@
 \chapter{Typsicherheit mit TypeScript}
 \chapter{Ansatz-Struktur-Entscheidung}
 \chapter{Herausforderungen bei den Read-Abfragen}
+Hier sind ein paar Einschränkungen, die wir bei der Umsetzung von Leseanfragen in Firestore hatten. 
+
+\begin{enumerate}
+    \item  Kein JOIN: Wir können in SQL mehrere Tabellen mit JOIN miteinander verknüpfen. Das geht nicht direkt in Firestore. Der Leseanfrage \textbf{d} könnte man in SQL mit Join von Angebot und Kurs über die Kurs-Nr. abfragen. Wir müssen zuerst alle Angebote in Firestore laden. Danach laden wir für jedes Angebot das dazugehörige Kursdokument aus der Kurs-Sammlung einzeln nach. Dadurch gibt es viele einzelne Leseoperationen. Das hätte für eine umfangreichere Datenbank zu höhere Zeitkosten geführt.
+
+    \item Keine Aggregationen wie \textbf{COUNT, GROUP BY}: Firestore bietet keine Unterstützung für Aggregationen wie COUNT(*), AVG() oder GROUP BY. In Query \textbf{i} , in der alle Kurse mit mindestens zwei Teilnehmern gesucht werden, muss deshalb zunächst ein Zählerobjekt (teilnehmerCounter) im Code erstellt werden, das alle Teilnahmen durchläuft und pro Kurs-Angebot die Anzahl speichert. In einem relationalen Datenbank wäre dies eine einzige SQL-Zeile mit GROUP BY und HAVING COUNT(*) >= 2.
+\end{enumerate}
+
+
+
+
+
+
+
+
+
 \chapter{Herausforderungen bei den Update-Abfragen}
 \chapter{Herausforderungen bei den Delete-Abfragen}
 \chapter{Fazit}
