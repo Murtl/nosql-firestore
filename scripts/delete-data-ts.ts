@@ -9,10 +9,6 @@ async function aufgabe6() {
     console.log('🗑️ Aufgabe 6: Delete Queries\n');
 
     // a) Lösche die Kursliteratur für "C-Programmierung"
-
-    // to clarify if the standard document is what refer to as die Kursliteratur
-    // für den Kurs „C-Programmierung“ or if this could contain more than one document
-
     /**
      * @old-relational-table Kurs, KursLiteratur
      * @collections kurse, kurse/kursliteratur
@@ -63,11 +59,12 @@ async function aufgabe6() {
     /**
      * @old-relational-table Nimmt_teil, Angebot, Gebühren
      * @collections angebote, teilnehmer, teilnehmer/teilnahmen
+     *
      * @id
      *   In "angebote": Dokumenten-ID = AngNr_KursNr (z.B.: "2_P13")
      *   In "teilnehmer": Dokumenten-ID = TnNr
      *   In Subcollection "teilnahmen": Feld AngNr_KursNr referenziert Angebot
-     * @delete Das Dokument in "angebote" wird gelöscht und alle Teilnahmen in der Subcollection "teilnahmen" der Teilnehmer für diese Angebote.
+     *
      * @logic
      *   In SQL:
      *       Finde Angebote mit weniger als 2 Teilnehmern:
