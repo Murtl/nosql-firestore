@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { Firestore, Timestamp, FirestoreDataConverter } from '@google-cloud/firestore';
-import {Angebot, createConverter, Kurs, Kursleiter, Teilnehmer} from "../data/types";
+import { Angebot, createConverter, Kurs, Kursleiter, Teilnehmer } from "../data/types";
 
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 
@@ -13,6 +13,22 @@ const kursConverter = createConverter<Kurs>();
 const angebotConverter = createConverter<Angebot>();
 const kursleiterConverter = createConverter<Kursleiter>();
 const teilnehmerConverter = createConverter<Teilnehmer>();
+
+// Kursleiterdaten laden
+const rawKursleiter = fs.readFileSync('data/kursleiter.json', 'utf-8');
+const kursleiterData: Record<string, Kursleiter> = JSON.parse(rawKursleiter);
+const kursleiterCache = new Map<number, Kursleiter>();
+for (const [id, kl] of Object.entries(kursleiterData)) {
+    kursleiterCache.set(Number(id), kl);
+}
+
+// Kursdaten laden
+const rawKurse = fs.readFileSync('data/kurse.json', 'utf-8');
+const kursData: Record<string, Kurs> = JSON.parse(rawKurse);
+const kursTitelMap = new Map<string, string>();
+for (const [id, kurs] of Object.entries(kursData)) {
+    kursTitelMap.set(id, kurs.Titel);
+}
 
 async function loadStructuredData<T>(
     collectionName: string,
@@ -48,7 +64,7 @@ async function loadStructuredData<T>(
                     await docRef.collection('kursliteratur').doc('standard').set(kursliteratur);
                 }
 
-                if(voraussetzungen && voraussetzungen.length > 0) {
+                if (voraussetzungen && voraussetzungen.length > 0) {
                     for (const v of voraussetzungen) {
                         await docRef.collection('voraussetzungen').doc(v).set({ Voraussetzung: v });
                     }
@@ -56,8 +72,12 @@ async function loadStructuredData<T>(
             }
 
             if (collectionName === 'angebote') {
-                for (const pid of data[id].kursleiter) {
-                    await docRef.collection('kursleiter').doc(pid.toString()).set({ PersNr: pid });
+                const kursleiterArray = document.kursleiter;
+                for (const leiter of kursleiterArray) {
+                    await docRef.collection('kursleiter').doc(leiter.PersNr.toString()).set({
+                        PersNr: leiter.PersNr,
+                        Gehalt: leiter.Gehalt
+                    });
                 }
             }
 
@@ -94,10 +114,25 @@ async function main() {
         'angebote',
         'data/angebote.json',
         angebotConverter,
-        (doc) => ({
-            ...doc,
-            Datum: Timestamp.fromDate(new Date(doc.Datum))
-        })
+        (doc) => {
+            const kursleiterInfos = doc.kursleiter.map((pid: number) => {
+                const k = kursleiterCache.get(pid);
+                return {
+                    PersNr: pid,
+                    Name: k?.Name ?? "Unbekannt",
+                    Gehalt: k?.Gehalt ?? 0
+                };
+            });
+
+            const titel = kursTitelMap.get(doc.KursNr) ?? "Unbekannter Kurs";
+
+            return {
+                ...doc,
+                Datum: Timestamp.fromDate(new Date(doc.Datum)),
+                KursTitel: titel,
+                kursleiter: kursleiterInfos
+            };
+        }
     );
 
     await loadStructuredData<Kursleiter>(
