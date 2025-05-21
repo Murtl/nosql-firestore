@@ -62,17 +62,26 @@ async function aufgabe4() {
     kursleiter.forEach(doc =>
         console.log(`- ${doc.data().Name}: ${doc.data().Gehalt}€`));
 
-    // d) Kurstitel mit Datum und Ort
     /**
-     * @Firestore-Logik:
-     *   - Alle Dokumente aus 'angebote' laden
-     *   - Für jedes Angebot: 'KursNr' auslesen
-     *   - Passenden Kurs aus 'kurse' über KursNr als Dokument-ID nachladen
-     *   - Ausgabe: kurs.Titel, angebot.Datum, angebot.Ort
+     * @old-relational-table Angebot, Kurs
+     * @collections angebote, kurse
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT k.Titel, a.Datum, a.Ort
+     *   FROM Angebot a JOIN Kurs k ON a.KursNr = k.KursNr;
      *
-     * @SQL-Vergleich: SELECT k.Titel, a.Datum, a.Ort FROM Angebot a JOIN Kurs k ON a.KursNr = k.KursNr
-     *   - Firestore-Problem: Kein JOIN → jeder Kurs muss einzeln nachgeladen werden
+     * 🔹 In Firestore:
+     *   - Alle Dokumente aus der Collection 'angebote' lesen
+     *   - Für jedes Angebot das zugehörige Kurs-Dokument über KursNr (Document-ID) laden
+     *   - Datum (Timestamp) wird per .toDate().toLocaleDateString() in lesbares Format umgewandelt
+     *   - Ausgabe: kurse.Titel, angebot.Datum, angebot.Ort
+     *
+     * @difference-to-sql
+     *   In SQL erfolgt die Verknüpfung über JOIN automatisch in einer Abfrage.
+     *   In Firestore müssen die verknüpften Daten (z. B. Kurs) manuell über ihre ID nachgeladen werden.
+     *       -> Dies führt zu mehreren Leseoperationen und mehr Codeaufwand.
      */
+    // d) Kurstitel mit Datum und Ort
     console.log('\n📚 Kurstitel mit Datum und Ort:');
     const angebote = await db.collection('angebote').get();
     for (const angebotDoc of angebote.docs) {
@@ -84,16 +93,29 @@ async function aufgabe4() {
         }
     }
 
-    // e) Kurstitel mit Datum, Ort und Kursleiter
     /**
-     * @Firestore-Logik:
-     *  - Alle 'angebote' durchgehen
-     *  - 'KursNr' → Titel über 'kurse' holen (wie d)
-     *  - 'kursleiter': Array mit PersNr im Angebot
-     *  - Für jede PersNr: passendes Dokument aus 'kursleiter' nachladen
+     * @old-relational-table Angebot, Kurs, Fuehrt_durch, Kursleiter
+     * @collections angebote, kurse, kursleiter (Subcollection unter angebote: kursleiter)
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT k.Titel, a.Datum, a.Ort, l.Name
+     *   FROM Angebot a
+     *   JOIN Kurs k ON a.KursNr = k.KursNr
+     *   JOIN Fuehrt_durch f ON f.AngNr = a.AngNr AND f.KursNr = a.KursNr
+     *   JOIN Kursleiter l ON f.PersNr = l.PersNr;
      *
-     *  @Firestore SQL-Vergleich: JOIN mit Fuehrt_durch und Kursleiter
-     *   - Problem: Für jeden Kursleiter ein separates Read nötig
+     * 🔹 In Firestore:
+     *   - Alle Angebote aus 'angebote' laden
+     *   - Für jedes Angebot: Kurs über 'kurse[angebot.KursNr]' laden
+     *   - Kursleiter liegen als Subcollection unter dem Angebot: 'angebote/{id}/kursleiter'
+     *   - Für jede ID in Subcollection: Name aus 'kursleiter' Collection nachladen
+     *
+     * @difference-to-sql
+     *   In SQL wird alles in einem JOIN abgebildet.
+     *   In Firestore sind mehrere Schritte nötig:
+     *   - Kursleiter-IDs liegen dezentral in einer Subcollection
+     *   - Kursleiter-Details müssen einzeln nachgeladen werden
+     *   - Es gibt keinen direkten JOIN → viele Einzel-Reads
      */
     console.log('\n📚 Kurstitel mit Datum, Ort und Kursleiter:');
     for (const angebotDoc of angebote.docs) {
@@ -114,17 +136,29 @@ async function aufgabe4() {
         console.log(`- ${kurs.data().Titel}: ${angebot.Datum}, ${angebot.Ort}, Kursleiter: ${leiterText}`);
     }
 
-    // f) Kurstitel mit Voraussetzungen
     /**
-     * @Firestore-Logik:
-     * - Alle Kurse aus 'kurse' laden
-     * - 'voraussetzungen': Array mit KursNr
-     * - Für jede KursNr in Voraussetzungen den Kurstitel aus 'kurse' nachladen
-     * - Wenn leer → Ausgabe „NULL“ als Text
-     *
-     * @SQL-Vergleich: LEFT JOIN Vorauss v ON KursNr
-     * - Nachteil: wie vorher kein join möglich (left join)– leere Felder müssen manuell behandelt werden
-     */
+     * @old-relational-table Kurs, Vorauss
+     * @collections kurse, kurse/{KursNr}/voraussetzungen (Subcollection aus Kurse)
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT k.Titel, v.VorNr
+     *   FROM Kurs k
+     *   LEFT JOIN Vorauss v ON k.KursNr = v.KursNr;
+
+    * 🔹 In Firestore:
+    *   - Alle Dokumente aus 'kurse' laden
+    *   - Für jeden Kurs: Subcollection 'voraussetzungen' abrufen
+    *   - Für jede Voraussetzung (v.id): den Kurs über 'kurse[v.id]' nachladen
+    *   - Ausgabe: Titel des Kurses + Titel der Voraussetzungen
+
+    * @difference-to-sql
+    *   In SQL ist das ein einfacher LEFT JOIN.
+    *   In Firestore:
+    *     - Jede Voraussetzung muss separat gelesen werden (mehrere Reads)
+    *     - Subcollections sind an Kurs gebunden – globale Analyse erschwert
+    *     - Bei NULL-Werte wird nichts geschrieben
+    */
+    // f) Kurstitel mit Voraussetzungen
     console.log('\n📚 Kurstitel mit Voraussetzungen:\n');
     const kurseSnapshot = await db.collection('kurse').get();
     const kurseMitVoraussetzungen = [];
@@ -154,17 +188,30 @@ async function aufgabe4() {
         console.log(kurs.kursTitel.padEnd(40) + vorausText);
     }
 
-    // g) Teilnehmer, die einen Kurs am eigenen Wohnort gebucht haben
     /**
-     * @Firestore-Logik:
-     * - Alle Teilnehmer durchgehen
-     * - Für jeden Teilnehmer: teilnahmen[] prüfen
-     * - Jede Teilnahme enthält AngNr (z. B. '1_P13')
-     * - Das passende Angebot aus 'angebote' holen → Ort vergleichen mit Teilnehmer.Ort
+     * @old-relational-table Teilnehmer, Angebot, Nimmt_teil
+     * @collections teilnehmer, teilnehmer/{TnNr}/teilnahmen, angebote
      *
-     * @SQL-Vergleich: JOIN Teilnehmer, Nimmt_teil, Angebot WHERE Ort übereinstimmt
-     * - Nachteil: Kein Mehrfach-JOIN → viel manuelle Verknüpfung + viele Reads
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT t.Name, a.Ort
+     *   FROM Teilnehmer t
+     *   JOIN Nimmt_teil nt ON t.TnNr = nt.TnNr
+     *   JOIN Angebot a ON a.AngNr = nt.AngNr
+     *   WHERE t.Ort = a.Ort;
+     *
+     * 🔹 In Firestore:
+     *   - Alle Teilnehmer laden
+     *   - Für jeden Teilnehmer → Subcollection teilnahmen lesen
+     *   - Für jede Teilnahme → passendes Angebot per ID laden
+     *   - Wohnort vom Teilnehmer mit Ort des Angebots vergleichen
+     *   - Bei Übereinstimmung ausgeben
+     *
+     * @difference-to-sql
+     *   In SQL reicht ein einziger JOIN mit WHERE-Bedingung.
+     *   In Firestore sind mehrere Reads notwendig: Teilnehmer → Teilnahmen → Angebot.
      */
+    // g) Teilnehmer, die einen Kurs am eigenen Wohnort gebucht haben
     console.log('\n👥 Teilnehmer am eigenen Wohnort:');
     const teilnehmerSnap = await db.collection('teilnehmer').get();
     for (const tnDoc of teilnehmerSnap.docs) {
@@ -181,16 +228,29 @@ async function aufgabe4() {
         }
     }
 
-    // h) Kursangebote ohne Teilnehmer
-    /**
-     * @Firestore-Logik:
-     *  - Alle teilnahmen[] aller Teilnehmer durchgehen → belegte AngNr sammeln (Set)
-     *  - Alle Angebote durchgehen → ID vergleichen mit Set
-     *  - Wenn nicht enthalten → anzeigen
+      /**
+     * @old-relational-table Angebot, Nimmt_teil, Teilnehmer
+     * @collections angebote, teilnehmer/{id}/teilnahmen
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT * FROM Angebot a
+     *   LEFT JOIN Nimmt_teil nt ON a.AngNr = nt.AngNr
+     *   WHERE nt.TnNr IS NULL;
      *
-     * @SQL-Vergleich: LEFT JOIN mit WHERE Teilnehmer IS NULL
-     *  - Nachteil: Firestore hat kein LEFT JOIN → Existenz muss manuell geprüft werden
+     * 🔹 In Firestore:
+     *   - Alle Teilnehmer durchlaufen
+     *   - Pro Teilnehmer: Subcollection 'teilnahmen' abrufen
+     *   - Alle belegten AngNr in Set speichern
+     *   - Danach: Alle Angebote durchgehen
+     *   - Wenn Angebot.ID nicht im Set → ausgeben
+     *   - Kurs-Titel wird über Angebot.KursNr aus 'kurse' nachgeladen
+     *
+     * @difference-to-sql
+     *   Firestore kennt kein LEFT JOIN oder NULL-Filter.
+     *   Stattdessen: Manuelle Umsetzung über Set-Logik + Subcollection-Zugriff.
+     *   Kein direkter globaler Query auf teilnahmen → iteration notwendig.
      */
+    // h) Kursangebote ohne Teilnehmer
     console.log('\n📚 Kursangebote ohne Teilnehmer:');
     const angeboteSnap = await db.collection('angebote').get();
     const belegteAngebote = new Set();
@@ -211,17 +271,31 @@ async function aufgabe4() {
         }
     }
 
-    // i) Kurse mit mindestens 2 Teilnehmern
     /**
-     * @Firestore-Logik:
-     *   - Alle teilnahmen[] sammeln
-     *   - Jede AngNr zählen → Map[AngNr] = Anzahl
-     *   - Nur Einträge mit count ≥ 2 behalten
-     *   - Kursname über KursNr aus 'kurse' nachladen
+     * @old-relational-table Nimmt_teil, Kurs, Angebot
+     * @collections teilnehmer, teilnehmer/{id}/teilnahmen , angebote, kurse
+     * @logic
+     * 🔸 In SQL:
+     *   SELECT k.Titel, COUNT(*) AS Anzahl
+     *   FROM Nimmt_teil nt
+     *   JOIN Angebot a ON nt.AngNr = a.AngNr
+     *   JOIN Kurs k ON a.KursNr = k.KursNr
+     *   GROUP BY nt.AngNr
+     *   HAVING COUNT(*) >= 2;
      *
-     * @SQL-Vergleich: GROUP BY + HAVING COUNT(*) >= 2
-     *   - Nachteil: Keine Aggregation in Firestore → Zählen muss manuell erfolgen
+     * 🔹 In Firestore:
+     *   - Für jeden Teilnehmer `teilnehmer/{TnNr}` die Subcollection `teilnahmen` lesen
+     *   - Für jede Teilnahme: `AngNr` zählen (Counter-Map)
+     *   - Nur Angebote mit ≥ 2 Einträgen verwenden
+     *   - Jeweils dazugehöriges `angebot` und `kurs` per ID nachladen
+     *   - Ausgabe: Kurstitel + Teilnehmeranzahl
+     *
+     * @difference-to-sql
+     *   - Kein GROUP BY oder HAVING in Firestore → Zählung erfolgt manuell im Code
+     *   - Kein Join zwischen Teilnahme, Angebot, Kurs → alles muss mit separaten `.get()`-Operationen verknüpft werden
+     *   - Mehrere Lesezugriffe pro Ergebnis → langsamer & komplexer
      */
+     // i) Kurse mit mindestens 2 Teilnehmern
     console.log('\n📚 Kurse mit mind. 2 Teilnehmern:');
     const teilnahmeCounter = {};
     for (const tnDoc of teilnehmerSnap.docs) {
