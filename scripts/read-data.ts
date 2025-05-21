@@ -59,9 +59,10 @@ async function aufgabe4() {
     console.log('\n👩‍🏫 Kursleiter (Gehalt 3000€-4000€):');
     kursleiterSnap.forEach(k => console.log(`- ${k.data().Name}: ${k.data().Gehalt}€`));
 
+    // d) Kurstitel mit Datum und Ort
     /**
      * @old-relational-table Angebot, Kurs
-     * @collections angebote, kurse
+     * @collections angebote
      * @logic
      * 🔸 In SQL:
      *   SELECT k.Titel, a.Datum, a.Ort
@@ -69,29 +70,24 @@ async function aufgabe4() {
      *
      * 🔹 In Firestore:
      *   - Alle Dokumente aus der Collection 'angebote' lesen
-     *   - Für jedes Angebot das zugehörige Kurs-Dokument über KursNr (Document-ID) laden
+     *   - Für jedes Angebot die gefragten Infos ausgeben
      *   - Datum (Timestamp) wird per .toDate().toLocaleDateString() in lesbares Format umgewandelt
-     *   - Ausgabe: kurse.Titel, angebot.Datum, angebot.Ort
+     *   - Ausgabe: angebot.KursTitel, angebot.Datum, angebot.Ort
      *
      * @difference-to-sql
      *   In SQL erfolgt die Verknüpfung über JOIN automatisch in einer Abfrage.
-     *   In Firestore müssen die verknüpften Daten (z. B. Kurs) manuell über ihre ID nachgeladen werden.
-     *       -> Dies führt zu mehreren Leseoperationen und mehr Codeaufwand.
+     *   In Firestore haben wir durch die Redundanz in der Collection 'angebote' die KursTitel
+     *   bereits im Angebot gespeichert (Vorteil unserer Datenstruktur).
      */
-
-    // d) Kurstitel mit Datum und Ort
-    console.log('\n Kurstitel mit Datum und Ort:');
+    console.log('\n📚 Kurstitel mit Datum und Ort:');
     for (const angebotDoc of angeboteSnapshot.docs) {
-        const angebot = angebotDoc.data();
-        const kursSnap = await db.collection('kurse').doc(angebot.KursNr).withConverter(createConverter<Kurs>()).get();
-        if (kursSnap.exists) {
-            console.log(`- ${kursSnap.data()?.Titel}: ${angebot.Datum.toDate().toLocaleDateString()} in ${angebot.Ort}`);
-        }
+        console.log(`- ${angebotDoc.data()?.KursTitel}: ${angebotDoc.data().Datum.toDate().toLocaleDateString()} in ${angebotDoc.data().Ort}`);
     }
 
+    // e) Kurstitel mit Datum, Ort und Kursleiter
     /**
      * @old-relational-table Angebot, Kurs, Fuehrt_durch, Kursleiter
-     * @collections angebote, kurse, kursleiter (Subcollection unter angebote: kursleiter)
+     * @collections angebote (Subcollection unter angebote: kursleiter)
      * @logic
      * 🔸 In SQL:
      *   SELECT k.Titel, a.Datum, a.Ort, l.Name
@@ -102,30 +98,27 @@ async function aufgabe4() {
      *
      * 🔹 In Firestore:
      *   - Alle Angebote aus 'angebote' laden
-     *   - Für jedes Angebot: Kurs über 'kurse[angebot.KursNr]' laden
      *   - Kursleiter liegen als Subcollection unter dem Angebot: 'angebote/{id}/kursleiter'
-     *   - Für jede ID in Subcollection: Name aus 'kursleiter' Collection nachladen
      *
      * @difference-to-sql
      *   In SQL wird alles in einem JOIN abgebildet.
-     *   In Firestore sind mehrere Schritte nötig:
-     *   - Kursleiter-IDs liegen dezentral in einer Subcollection
-     *   - Kursleiter-Details müssen einzeln nachgeladen werden
-     *   - Es gibt keinen direkten JOIN → viele Einzel-Reads
+     *   In Firestore liegt alles in der Collection 'angebote' und die Kursleiter sind ebenfalls dort redundant
+     *   als Subcollection gespeichert -> macht unsere Datenstruktur möglich.
      */
-
-    // e) Kurstitel mit Datum, Ort und Kursleiter
-    console.log('\n Kurstitel mit Datum, Ort und Kursleiter:');
+    console.log('\n📚 Kurstitel mit Datum, Ort und Kursleiter:');
     for (const angebotDoc of angeboteSnapshot.docs) {
-        const angebot = angebotDoc.data();
-        const kursSnap = await db.collection('kurse').doc(angebot.KursNr).withConverter(createConverter<Kurs>()).get();
+        const angebotData = angebotDoc.data();
         const kursleiterSnap = await angebotDoc.ref.collection('kursleiter').get();
-        const leiterNamen = await Promise.all(kursleiterSnap.docs.map(async leiterDoc => {
-            const leiterSnap = await db.collection('kursleiter').doc(leiterDoc.id).get();
-            return leiterSnap.exists ? leiterSnap.data()?.Name : 'Unbekannt';
-        }));
-        console.log(`- ${kursSnap.data()?.Titel}: ${angebot.Datum.toDate().toLocaleDateString()}, ${angebot.Ort}, Kursleiter: ${leiterNamen.join(', ')}`);
+        let kursleiterName = kursleiterSnap.docs.map(doc => doc.data().Name).join(', ');
+        if (kursleiterName.length === 0) {
+            console.warn(`⚠️ Kursleiter für Angebot ${angebotDoc.id} nicht gefunden.`);
+            kursleiterName = 'Unbekannt';
+            continue;
+        }
+        console.log(`- ${angebotData?.KursTitel}: ${angebotData?.Datum.toDate().toLocaleDateString()}, in ${angebotData?.Ort}, Kursleiter: ${kursleiterName}`);
     }
+
+    // f) Kurstitel mit Voraussetzungen
     /**
      * @old-relational-table Kurs, Vorauss
      * @collections kurse, kurse/{KursNr}/voraussetzungen (Subcollection aus Kurse)
@@ -135,32 +128,63 @@ async function aufgabe4() {
      *   FROM Kurs k
      *   LEFT JOIN Vorauss v ON k.KursNr = v.KursNr;
 
-    * 🔹 In Firestore:
-    *   - Alle Dokumente aus 'kurse' laden
-    *   - Für jeden Kurs: Subcollection 'voraussetzungen' abrufen
-    *   - Für jede Voraussetzung (v.id): den Kurs über 'kurse[v.id]' nachladen
-    *   - Ausgabe: Titel des Kurses + Titel der Voraussetzungen
+     * 🔹 In Firestore:
+     *   - Alle Dokumente aus 'kurse' laden
+     *   - Für jeden Kurs: Subcollection 'voraussetzungen' abrufen
+     *   - Für jede Voraussetzung (v.id): den Kurs über 'kurse[v.id]' nachladen
+     *   - Ausgabe: Titel des Kurses + Titel der Voraussetzungen
 
-    * @difference-to-sql
-    *   In SQL ist das ein einfacher LEFT JOIN.
-    *   In Firestore:
-    *     - Jede Voraussetzung muss separat gelesen werden (mehrere Reads)
-    *     - Subcollections sind an Kurs gebunden – globale Analyse erschwert
-    *     - NULL-Werte müssen manuell ersetzt werden 
-    */
+     * @difference-to-sql
+     *   In SQL ist das ein einfacher LEFT JOIN.
+     *   In Firestore:
+     *     - Jede Voraussetzung muss separat gelesen werden (mehrere Reads)
+     *     - Subcollections sind an Kurs gebunden – globale Analyse erschwert
+     *     - NULL-Werte müssen manuell ersetzt werden
+     */
+    console.log('\n📚 Kurstitel mit Voraussetzungen:\n');
+    console.log('Kurs\t\t\t Voraussetzungen');
 
-    // f) Kurstitel mit Voraussetzungen
-    console.log('\n Kurstitel mit Voraussetzungen:');
-    const kurseSnap = await db.collection('kurse').withConverter(createConverter<Kurs>()).get();
+    const kurseSnap = await db.collection('kurse')
+        .withConverter(createConverter<Kurs>())
+        .get();
+
+    // Array für Ergebnisse
+    const results: { kursTitel: string; voraussetzungen: string[] | null }[] = [];
+
     for (const kursDoc of kurseSnap.docs) {
+        const kurs = kursDoc.data();
         const vorausSnap = await kursDoc.ref.collection('voraussetzungen').get();
-        const vorausTitel = await Promise.all(vorausSnap.docs.map(async v => {
-            const vSnap = await db.collection('kurse').doc(v.id).get();
-            return vSnap.exists ? vSnap.data()?.Titel : 'NULL';
-        }));
-        console.log(`- ${kursDoc.data().Titel}: ${vorausTitel.join(', ')}`);
+
+        if (vorausSnap.empty) {
+            results.push({
+                kursTitel: kurs.Titel,
+                voraussetzungen: null
+            });
+        } else {
+            const vorausTitel = await Promise.all(
+                vorausSnap.docs.map(async v => {
+                    const vSnap = await db.collection('kurse').doc(v.id).get();
+                    return vSnap.exists ? vSnap.data()?.Titel ?? 'NULL' : 'NULL';
+                })
+            );
+
+            results.push({
+                kursTitel: kurs.Titel,
+                voraussetzungen: vorausTitel
+            });
+        }
     }
 
+    // Sortieren nach Kurs-Titel
+    results.sort((a, b) => a.kursTitel.localeCompare(b.kursTitel));
+
+    // Ausgabe
+    for (const eintrag of results) {
+        const vorausText = eintrag.voraussetzungen ? eintrag.voraussetzungen.join(', ') : 'NULL';
+        console.log(`${eintrag.kursTitel.padEnd(25)}${vorausText}`);
+    }
+
+    // g) Teilnehmer, die einen Kurs am eigenen Wohnort gebucht haben
     /**
      * @old-relational-table Teilnehmer, Angebot, Nimmt_teil
      * @collections teilnehmer, teilnehmer/{TnNr}/teilnahmen, angebote
@@ -184,8 +208,6 @@ async function aufgabe4() {
      *   In SQL reicht ein einziger JOIN mit WHERE-Bedingung.
      *   In Firestore sind mehrere Reads notwendig: Teilnehmer → Teilnahmen → Angebot.
      */
-
-    // g) Teilnehmer, die einen Kurs am eigenen Wohnort gebucht haben
     console.log('\n👥 Teilnehmer am eigenen Wohnort:');
     const teilnehmerSnap = await db.collection('teilnehmer').withConverter(createConverter<Teilnehmer>()).get();
     for (const tnDoc of teilnehmerSnap.docs) {
@@ -200,6 +222,7 @@ async function aufgabe4() {
         }
     }
 
+    // h) Kursangebote ohne Teilnehmer
     /**
      * @old-relational-table Angebot, Nimmt_teil, Teilnehmer
      * @collections angebote, teilnehmer/{id}/teilnahmen
@@ -222,8 +245,6 @@ async function aufgabe4() {
      *   Stattdessen: Manuelle Umsetzung über Set-Logik + Subcollection-Zugriff.
      *   Kein direkter globaler Query auf teilnahmen → iteration notwendig.
      */
-
-    // h) Kursangebote ohne Teilnehmer
     console.log('\n📚 Kursangebote ohne Teilnehmer:');
     const belegteAngebote = new Set<string>();
     for (const tnDoc of teilnehmerSnap.docs) {
@@ -238,6 +259,7 @@ async function aufgabe4() {
         }
     }
 
+    // i) Kurse mit mindestens 2 Teilnehmern
     /**
      * @old-relational-table Nimmt_teil, Kurs, Angebot
      * @collections teilnehmer, teilnehmer/{id}/teilnahmen , angebote, kurse
@@ -262,22 +284,33 @@ async function aufgabe4() {
      *   - Kein Join zwischen Teilnahme, Angebot, Kurs → alles muss mit separaten `.get()`-Operationen verknüpft werden
      *   - Mehrere Lesezugriffe pro Ergebnis → langsamer & komplexer
      */
+    console.log('\n📚 Kurse mit mindestens 2 Teilnehmern (alle Angebote zusammengefasst):');
 
-    // i) Kurse mit mindestens 2 Teilnehmern
-    console.log('\n Kurse mit mind. 2 Teilnehmern:');
-    const teilnahmeCounter: Record<string, number> = {};
+    // Zähle Teilnehmer pro KursNr
+    const kursTeilnehmerCounter: Record<string, number> = {};
+
     for (const tnDoc of teilnehmerSnap.docs) {
         const teilnahmenSnap = await tnDoc.ref.collection('teilnahmen').get();
+
         for (const teilnahme of teilnahmenSnap.docs) {
-            const angNr = teilnahme.data().AngNr;
-            teilnahmeCounter[angNr] = (teilnahmeCounter[angNr] || 0) + 1;
+            const angebotId = teilnahme.data().AngNr as string;
+            const angebotSnap = await db.collection('angebote').doc(angebotId).get();
+
+            if (!angebotSnap.exists) continue;
+
+            const kursNr = angebotSnap.data()?.KursNr;
+            if (!kursNr) continue;
+
+            kursTeilnehmerCounter[kursNr] = (kursTeilnehmerCounter[kursNr] || 0) + 1;
         }
     }
-    for (const [angebotId, count] of Object.entries(teilnahmeCounter)) {
+
+    // Ausgabe nach KursNr
+    for (const [kursNr, count] of Object.entries(kursTeilnehmerCounter)) {
         if (count >= 2) {
-            const angebot = await db.collection('angebote').doc(angebotId).get();
-            const kurs = await db.collection('kurse').doc(angebot.data()?.KursNr).get();
-            console.log(`- ${kurs.exists ? kurs.data()?.Titel : angebot.data()?.KursNr}: ${count} Teilnehmer`);
+            const kursSnap = await db.collection('kurse').doc(kursNr).withConverter(createConverter<Kurs>()).get();
+            const titel = kursSnap.exists ? kursSnap.data()?.Titel : kursNr;
+            console.log(`- ${titel}: ${count} Teilnehmer`);
         }
     }
 
@@ -329,8 +362,8 @@ async function aufgabe4() {
     const angeboteSnap = await db.collection('angebote').get();
     const titelCounter = new Map<string, number>();
     angeboteSnap.docs.forEach(doc => {
-        const { KursNr, KursTitel } = doc.data() as Angebot;
-        const titel = KursTitel ?? KursNr;
+        const { KursTitel } = doc.data() as Angebot;
+        const titel = KursTitel;
         titelCounter.set(titel, (titelCounter.get(titel) ?? 0) + 1);
     });
     [...titelCounter.entries()]
@@ -338,11 +371,13 @@ async function aufgabe4() {
         .forEach(([titel, count]) =>
             console.log(`- ${titel}: ${count} Angebote`)
         );
+    // TODO @Gregor: Was wäre wenn ein Kurs kein Angebot hätte? Dann müsste es ja noch eine Abfrage geben um das
+    //  zu überprüfen, ob eben alle Kurse auch Angebote haben. Das ist hier nicht berücksichtigt.
 
     // l) Kurstitel mit mindestens 2 Voraussetzungen
     /**
      * @old-relational-table Vorauss, Kurs
-     * @collections voraussetzungen, kurse
+     * @collections kurse, kurse/{KursNr}/voraussetzungen (Subcollection aus Kurse)
      * @logic
      *   🔸 In SQL:
      *       SELECT k.titel FROM Kurs k JOIN Vorauss v ON k.KursNr = v.KursNr GROUP BY k.KursNr,
@@ -353,53 +388,86 @@ async function aufgabe4() {
      *   Firestore unterstützt weder JOINS noch Aggreagationen wie COUNT, daher muss manuell
      *   iteriert und gezählt werden.
      */
-    console.log('\n📚 Kurstitel mit mindestens 2 Voraussetzungen:');
+    const kurseMitVoraussetzungen: { titel: string; anzahl: number }[] = [];
+
     for (const kursDoc of kurseSnap.docs) {
+        const titel = kursDoc.data().Titel;
         const vorausSnap = await kursDoc.ref.collection('voraussetzungen').get();
+
         if (vorausSnap.size >= 2) {
-            console.log(`- ${kursDoc.data().Titel}: ${vorausSnap.size} Voraussetzungen`);
+            kurseMitVoraussetzungen.push({
+                titel,
+                anzahl: vorausSnap.size
+            });
         }
+    }
+
+    // Nach Anzahl absteigend sortieren
+    kurseMitVoraussetzungen.sort((a, b) => b.anzahl - a.anzahl);
+
+    // Ausgabe
+    console.log('\n📚Kurse mit mindestens 2 Voraussetzungen (absteigend sortiert):\n');
+    for (const kurs of kurseMitVoraussetzungen) {
+        console.log(`- ${kurs.titel}: ${kurs.anzahl} Voraussetzungen`);
     }
 
     // m) Durchschnittliches Gehalt der Kursleiter pro Kurs
     /**
      * @old-relational-table Kurs, Fuehrt_Durch, Kursleiter
-     * @collections angebote
+     * @collections angebote, angebote/{id}/kursleiter (Subcollection aus Angebote)
      * @logic
      *   🔸 In SQL: SELECT k.Titel, AVG(kl.Gehalt) FROM Kurs k JOIN Fuehrt_Durch fd ON k.KursNr = fd.KursNr
      *   JOIN Kursleiter kl ON fd.PersNr = kl.PersNr GROUP BY k.KursNr, k.Titel;
      *   🔹 In Firestore:
      *       Alle `angebote`-Dokumente laden, Kursleiter und deren Gehälter pro KursNr sammeln.
-     *       Kurstitel ist bereits direkt im Angebot eingebettet.
+     *       Kurstitel ist bereits als Subcollection direkt im Angebot eingebettet.
      *       Danach Durchschnitt berechnen und sortiert ausgeben.
      * @difference-to-sql
-     *   Kein JOIN oder AVG vorhanden. Um die daraus entstehenden mehrfachen Abfragen zu vermeiden, wurde mit Redundanz in der Collection `angebote` gearbeitet.
+     *   Kein JOIN oder AVG vorhanden. Um die daraus entstehenden mehrfachen Abfragen zu vermeiden,
+     *   wurde mit Redundanz in der Collection `angebote` gearbeitet.
      */
-    console.log('\n📚 Durchschnittliches Gehalt der Kursleiter pro Kurs:');
-    const kursGehaelterMap = new Map<string, { titel: string, gehaelter: number[] }>();
+    console.log('\n📚 Durchschnittliches Gehalt der Kursleiter pro Kurs (aufsteigend):');
+
+    const kursGehaelterMap = new Map<string, { titel: string; gehaelter: number[] }>();
 
     for (const angebot of angeboteSnap.docs) {
-        const { KursNr, KursTitel, kursleiter } = angebot.data() as Angebot;
+        const { KursNr, KursTitel } = angebot.data() as Angebot;
+
+        // Subcollection 'kursleiter' laden
+        const kursleiterSnap = await angebot.ref.collection('kursleiter').get();
+        const kursleiterList = kursleiterSnap.docs.map(doc => doc.data() as { PersNr: number, Gehalt: number });
+
         if (!kursGehaelterMap.has(KursNr)) {
             kursGehaelterMap.set(KursNr, { titel: KursTitel ?? KursNr, gehaelter: [] });
         }
 
-        kursleiter?.forEach(k => {
-            kursGehaelterMap.get(KursNr)?.gehaelter.push(k.Gehalt);
-        });
+        for (const leiter of kursleiterList) {
+            kursGehaelterMap.get(KursNr)?.gehaelter.push(leiter.Gehalt);
+        }
     }
+
+    // Ergebnisse berechnen
+    const result: { titel: string; avg: number }[] = [];
 
     for (const { titel, gehaelter } of kursGehaelterMap.values()) {
         if (gehaelter.length === 0) continue;
         const avg = gehaelter.reduce((a, b) => a + b, 0) / gehaelter.length;
+        result.push({ titel, avg });
+    }
+
+    // Aufsteigend sortieren
+    result.sort((a, b) => a.avg - b.avg);
+
+    // Ausgabe
+    for (const { titel, avg } of result) {
         console.log(`- ${titel}: ${avg.toFixed(2)} €`);
     }
 
+
     // n) Kursleiter-Paare, die denselben Kurs halten
-    console.log('\n👩‍🏫 Kursleiter-Paare für denselben Kurs:');
     /**
      * @old-relational-table Fuehrt_Durch, Kursleiter, Kurs
-     * @collections angebote
+     * @collections angebote, angebote/{id}/kursleiter (Subcollection aus Angebote)
      * @logic
      *   🔸 In SQL:
      *       SELECT kl1.Name, kl2.Name, k.Titel
@@ -417,24 +485,33 @@ async function aufgabe4() {
      *   Kein Self-Join möglich – Paare müssen im Client konstruiert werden.
      *   Dank Redundanz in 'angebote' sind keine Subcollection- oder Zusatzabfragen auf `kursleiter` oder `kurse` nötig.
      */
-    // Schritt 1: Kursleiter je KursNr sammeln
+    console.log('\n👩‍🏫 Kursleiter-Paare für denselben Kurs:');
+
+    // Kursleiter je KursNr sammeln
     const kursleiterProKurs: Record<string, Map<number, string>> = {}; // KursNr → Map<PersNr, Name>
     const kursTitelMap = new Map<string, string>();
 
-    angeboteSnap.forEach(doc => {
-        const angebot = doc.data();
-        const kursNr = angebot.KursNr;
-        const titel = angebot.KursTitel ?? kursNr;
+    for (const angebot of angeboteSnap.docs) {
+        const angebotData = angebot.data();
+        const kursNr = angebotData.KursNr;
+        const titel = angebotData.KursTitel ?? kursNr;
         kursTitelMap.set(kursNr, titel);
 
-        if (!kursleiterProKurs[kursNr]) kursleiterProKurs[kursNr] = new Map();
+        // Subcollection "kursleiter" lesen
+        const leiterSnap = await angebot.ref.collection('kursleiter').get();
 
-        for (const leiter of angebot.kursleiter ?? []) {
-            kursleiterProKurs[kursNr].set(leiter.PersNr, leiter.Name ?? `#${leiter.PersNr}`);
+        for (const doc of leiterSnap.docs) {
+            const { Name } = doc.data() as Kursleiter;
+
+            if (!kursleiterProKurs[kursNr]) {
+                kursleiterProKurs[kursNr] = new Map();
+            }
+
+            kursleiterProKurs[kursNr].set(Number(doc.id), Name); // Duplikate werden durch Map automatisch vermieden
         }
-    });
+    }
 
-    // Schritt 2: Ausgabe aller Kursleiter-Paare mit Namen
+    // Paare bilden
     for (const [kursNr, leiterMap] of Object.entries(kursleiterProKurs)) {
         const titel = kursTitelMap.get(kursNr) ?? kursNr;
         const leiter = Array.from(leiterMap.entries()); // [PersNr, Name]
@@ -449,6 +526,7 @@ async function aufgabe4() {
             }
         }
     }
+
 
     console.log('\n✅ Fertig.');
 }

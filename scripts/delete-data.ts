@@ -1,4 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
+import {Kurs, Teilnehmer, Teilnahme, Angebot, createConverter} from '../data/types';
+
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 
 const db = new Firestore({ projectId: 'custom-emulator', ssl: false });
@@ -27,15 +29,17 @@ async function aufgabe6() {
      *   In SQL reicht eine einfache WHERE-Klausel; in Firestore ist eine Suche nach dem Titel nötig,
      *   gefolgt vom Zugriff auf eine Subcollection mit fixer ID ("standard").
      */
+    const kursSnapshot = await db.collection('kurse')
+        .withConverter(createConverter<Kurs>())
+        .where('Titel', '==', 'C-Programmierung').get();
 
-    const kursSnapshot = await db.collection('kurse').where('Titel', '==', 'C-Programmierung').get();
     if (kursSnapshot.empty) {
         console.log('❌ Kurs "C-Programmierung" nicht gefunden.');
     } else {
         const kursDocRef = kursSnapshot.docs[0].ref;
         const litRef = kursDocRef.collection('kursliteratur').doc('standard');
         await litRef.delete();
-        console.log(`📚 Kursliteratur für "C-Programmierung" gelöscht.`);
+        console.log('📚 Kursliteratur für "C-Programmierung" gelöscht.');
     }
 
     // b) Lösche alle Kursangebote mit weniger als 2 Teilnehmern
@@ -64,18 +68,16 @@ async function aufgabe6() {
      *   Firestore hat kein GROUP BY oder Aggregation.
      *   Zählung und Selektion müssen manuell in der Applikation durchgeführt werden.
      */
-    const angeboteSnapshot = await db.collection('angebote').get();
-    const teilnehmerSnapshot = await db.collection('teilnehmer').get();
+    const angeboteSnapshot = await db.collection('angebote').withConverter(createConverter<Angebot>()).get();
+    const teilnehmerSnapshot = await db.collection('teilnehmer').withConverter(createConverter<Teilnehmer>()).get();
 
-    // Zähle Teilnehmer pro Angebot
-    const angebotTeilnahmeZaehler = {};
+    const angebotTeilnahmeZaehler: Record<string, number> = {};
 
     for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
-        const teilnahmen = await db.collection('teilnehmer').doc(teilnehmerDoc.id).collection('teilnahmen').get();
-        for (const t of teilnahmen.docs) {
-            const { AngNr } = t.data();
-            const angebotId = `${AngNr}`;
-            angebotTeilnahmeZaehler[angebotId] = (angebotTeilnahmeZaehler[angebotId] || 0) + 1;
+        const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
+        for (const t of teilnahmenSnap.docs) {
+            const { AngNr } = t.data() as Teilnahme;
+            angebotTeilnahmeZaehler[AngNr] = (angebotTeilnahmeZaehler[AngNr] || 0) + 1;
         }
     }
 
@@ -91,4 +93,4 @@ async function aufgabe6() {
     console.log('\n✅ Löschvorgänge abgeschlossen.');
 }
 
-await aufgabe6();
+aufgabe6().catch(console.error);

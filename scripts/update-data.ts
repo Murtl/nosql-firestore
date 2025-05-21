@@ -1,4 +1,6 @@
-import { Firestore } from '@google-cloud/firestore';
+import { Firestore, Timestamp } from '@google-cloud/firestore';
+import {Angebot, createConverter} from '../data/types';
+
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 
 const db = new Firestore({ projectId: 'custom-emulator', ssl: false });
@@ -23,13 +25,14 @@ async function aufgabe5() {
      *    welcher Kurs im Jahr 2023 stattfindet und das Jahr ebenso manuell abgeändert werden muss.
      *    In SQL erfolgt dies automatisch mit der Update-Anweisung
      */
-    const angeboteSnapshot = await db.collection('angebote').get();
+    const angeboteSnapshot = await db.collection('angebote').withConverter(createConverter<Angebot>()).get();
     for (const doc of angeboteSnapshot.docs) {
         const angebot = doc.data();
-        if (angebot.Datum && angebot.Datum.includes('2023')) {
-            const neuesDatum = angebot.Datum.replace('2023', '2024');
-            await doc.ref.update({ Datum: neuesDatum });
-            console.log(`🔄 Angebot ${doc.id} Datum aktualisiert auf ${neuesDatum}`);
+        const date = angebot.Datum.toDate();
+        if (date.getFullYear() === 2023) {
+            const neuesDatum = Timestamp.fromDate(new Date(date.setFullYear(2024)));
+            await doc.ref.update({Datum: neuesDatum});
+            console.log(`🔄 Angebot ${doc.id} Datum aktualisiert auf ${neuesDatum.toDate().toLocaleDateString()}`);
         }
     }
 
@@ -47,7 +50,10 @@ async function aufgabe5() {
      * @difference-to-sql
      *    Manuelles updaten der Dokumente.
      */
-    const angeboteWedel = await db.collection('angebote').where('Ort', '==', 'Wedel').get();
+    const angeboteWedel = await db.collection('angebote')
+        .withConverter(createConverter<Angebot>())
+        .where('Ort', '==', 'Wedel').get();
+
     for (const doc of angeboteWedel.docs) {
         await doc.ref.update({ Ort: 'Augsburg' });
         console.log(`📍 Angebot ${doc.id} von Wedel nach Augsburg verschoben.`);
@@ -56,4 +62,4 @@ async function aufgabe5() {
     console.log('\n✅ Fertig.');
 }
 
-await aufgabe5();
+aufgabe5().catch(console.error);
