@@ -14,9 +14,14 @@ export interface Kurs {
 
 export interface Angebot {
     KursNr: string;
+    KursTitel: string;
     Datum: Timestamp;
     Ort: string;
-    kursleiter: number[];
+    kursleiter: {
+        PersNr: number;
+        Name: string;
+        Gehalt: number;
+    }[];
 }
 
 export interface Kursleiter {
