@@ -14,23 +14,22 @@ async function aufgabe5() {
      *   🔸 In SQL (PostgreSQL) einfache UPDATE-Anweisung:
      *          UPDATE Angebot SET Datum = DATE + INTERVAL '1 year' WHERE EXTRACT(YEAR FROM Datum) = 2023;
      *   🔹 In Firestore:
-     *          - laden aller Angebote
-     *          - überprüfen aller Angebote ob im Jahr 2023 Angeboten wird
+     *          - laden aller Angebote, welche mit "2023" bei Datum starten
      *          - abändern des Datum Strings
      *          - anschließendes updaten in der Datenbank
      * @difference-to-sql
-     *    Firestore kann nicht mit der where Funktion Strings anhand von Substrings filtern, weshalb manuell geprüft werden muss,
-     *    welcher Kurs im Jahr 2023 stattfindet und das Jahr ebenso manuell abgeändert werden muss.
+     *    Laden aller Angebote, welche im Jahr 2023 stattfinden und anschließendes manuelles abändern des Datum, sowie speichern in der Datenbank.
      *    In SQL erfolgt dies automatisch mit der Update-Anweisung
      */
-    const angeboteSnapshot = await db.collection('angebote').get();
-    for (const doc of angeboteSnapshot.docs) {
+    const angebote2023 = await db.collection('angebote')
+        .where('Datum', '>=', '2023')
+        .where('Datum', '<=', '2023\uf8ff')
+        .get();
+    for (const doc of angebote2023.docs) {
         const angebot = doc.data();
-        if (angebot.Datum && angebot.Datum.includes('2023')) {
-            const neuesDatum = angebot.Datum.replace('2023', '2024');
-            await doc.ref.update({ Datum: neuesDatum });
-            console.log(`🔄 Angebot ${doc.id} Datum aktualisiert auf ${neuesDatum}`);
-        }
+        const neuesDatum = angebot.Datum.replace('2023', '2024');
+        await doc.ref.update({ Datum: neuesDatum });
+        console.log(`🔄 Angebot ${doc.id} Datum aktualisiert auf ${neuesDatum}`);
     }
 
     // b) Alle Angebote von "Wedel" nach "Augsburg"
