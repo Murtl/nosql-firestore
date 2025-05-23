@@ -1,22 +1,24 @@
 [0] Config.pm:308> INFO - This is Biber 2.20
 [0] Config.pm:311> INFO - Logfile is 'docu.blg'
-[105] biber-MSWIN64:340> INFO - === 
-[139] Biber.pm:420> INFO - Reading 'docu.bcf'
-[231] Biber.pm:994> INFO - Found 7 citekeys in bib section 0
-[245] Biber.pm:4463> INFO - Processing section 0
-[260] Biber.pm:4654> INFO - Looking for bibtex file 'Literatur_docu.bib' for section 0
-[316] bibtex.pm:1713> INFO - LaTeX decoding ...
-[334] bibtex.pm:1519> INFO - Found BibTeX data source 'Literatur_docu.bib'
-[384] UCollate.pm:68> INFO - Overriding locale 'de_DE' defaults 'variable = shifted' with 'variable = non-ignorable'
-[384] UCollate.pm:68> INFO - Overriding locale 'de_DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[384] Biber.pm:4283> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'de_DE'
-[384] Biber.pm:4289> INFO - No sort tailoring available for locale 'de_DE'
-[392] bbl.pm:676> INFO - Writing 'docu.bbl' with encoding 'ascii'
-[392] bbl.pm:677> INFO - Converting UTF-8 to TeX macros on output to .bbl
-[398] bbl.pm:779> INFO - Output to docu.bbl
-[399] Biber.pm:131> WARN - legacy year field '13.05.2025' in entry 'FirebaseDatenmodell.2025' is not an integer - this will probably not sort properly.
-[399] Biber.pm:131> WARN - legacy year field '15.05.2025' in entry 'GoogleCloudQueries.2025' is not an integer - this will probably not sort properly.
-[399] Biber.pm:131> WARN - legacy year field '08.05.2025' in entry 'EmulatorSuite.2025' is not an integer - this will probably not sort properly.
-[400] Biber.pm:131> WARN - legacy year field '08.05.2025' in entry 'EmulatorInsall.2025' is not an integer - this will probably not sort properly.
-[400] Biber.pm:131> WARN - legacy year field '21.08.2024' in entry 'Estuary.2025' is not an integer - this will probably not sort properly.
-[400] Biber.pm:133> INFO - WARNINGS: 5
+[88] biber-MSWIN64:340> INFO - === 
+[117] Biber.pm:420> INFO - Reading 'docu.bcf'
+[198] Biber.pm:994> INFO - Found 9 citekeys in bib section 0
+[210] Biber.pm:4463> INFO - Processing section 0
+[220] Biber.pm:4654> INFO - Looking for bibtex file 'Literatur_docu.bib' for section 0
+[266] bibtex.pm:1713> INFO - LaTeX decoding ...
+[282] bibtex.pm:1519> INFO - Found BibTeX data source 'Literatur_docu.bib'
+[326] UCollate.pm:68> INFO - Overriding locale 'de_DE' defaults 'variable = shifted' with 'variable = non-ignorable'
+[326] UCollate.pm:68> INFO - Overriding locale 'de_DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[326] Biber.pm:4283> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'de_DE'
+[326] Biber.pm:4289> INFO - No sort tailoring available for locale 'de_DE'
+[335] bbl.pm:676> INFO - Writing 'docu.bbl' with encoding 'ascii'
+[335] bbl.pm:677> INFO - Converting UTF-8 to TeX macros on output to .bbl
+[341] bbl.pm:779> INFO - Output to docu.bbl
+[342] Biber.pm:131> WARN - legacy year field '13.05.2025' in entry 'FirebaseDatenmodell.2025' is not an integer - this will probably not sort properly.
+[342] Biber.pm:131> WARN - legacy year field '15.05.2025' in entry 'GoogleCloudQueries.2025' is not an integer - this will probably not sort properly.
+[342] Biber.pm:131> WARN - legacy year field '08.05.2025' in entry 'EmulatorSuite.2025' is not an integer - this will probably not sort properly.
+[343] Biber.pm:131> WARN - legacy year field '08.05.2025' in entry 'EmulatorInsall.2025' is not an integer - this will probably not sort properly.
+[343] Biber.pm:131> WARN - legacy year field '21.08.2024' in entry 'Estuary.2025' is not an integer - this will probably not sort properly.
+[343] Biber.pm:131> WARN - legacy year field '13.05.2025' in entry 'FirebaseComparison.2025' is not an integer - this will probably not sort properly.
+[343] Biber.pm:131> WARN - legacy year field '11.05.2025' in entry 'MoldStud.2025' is not an integer - this will probably not sort properly.
+[343] Biber.pm:133> INFO - WARNINGS: 7

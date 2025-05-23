@@ -657,7 +657,6 @@ INPUT .\img\converter_example.png
 INPUT .\img\converter_example.png
 INPUT .\img\converter_example.png
 INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\tfm\public\tex-gyre\ec-qhvb.tfm
-INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\tfm\public\newtxtt\newtxbtta.tfm
 INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\tfm\public\newtx\ntx-Regular-tlf-t1.tfm
 INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\tfm\public\newtx\ntx-Italic-tlf-t1.tfm
 INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\tfm\public\newtx\ntx-Regular-tlf-sc-t1.tfm
@@ -701,8 +700,6 @@ INPUT .\docu.out
 INPUT .\docu.out
 INPUT docu.run.xml
 OUTPUT docu.run.xml
-INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\type1\public\newtxtt\newtxbtt.pfb
-INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\type1\public\newtxtt\newtxbtt.pfb
 INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\type1\public\newtxtt\newtxtt.pfb
 INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\type1\public\newtxtt\newtxtt.pfb
 INPUT C:\Users\michi\AppData\Local\Programs\MiKTeX\fonts\type1\public\tex-gyre\qhvb.pfb

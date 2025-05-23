@@ -140,7 +140,7 @@ async function aufgabe4() {
      *     - Subcollections sind an Kurs gebunden – globale Analyse erschwert
      *     - NULL-Werte müssen manuell ersetzt werden
      */
-    console.log('\n📚 Kurstitel mit Voraussetzungen:\n');
+    console.log('\n📚 Kurstitel mit Voraussetzungen:');
     console.log('Kurs\t\t\t Voraussetzungen');
 
     const kurseSnap = await db.collection('kurse')
@@ -425,7 +425,7 @@ async function aufgabe4() {
     kurseMitVoraussetzungen.sort((a, b) => b.anzahl - a.anzahl);
 
     // Ausgabe
-    console.log('\n📚Kurse mit mindestens 2 Voraussetzungen (absteigend sortiert):\n');
+    console.log('\n📚Kurse mit mindestens 2 Voraussetzungen (absteigend sortiert):');
     for (const kurs of kurseMitVoraussetzungen) {
         console.log(`- ${kurs.titel}: ${kurs.anzahl} Voraussetzungen`);
     }

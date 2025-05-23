@@ -196,6 +196,34 @@
       \verb https://estuary.dev/blog/firestore-query-best-practices/
       \endverb
     \endentry
+    \entry{FirebaseComparison.2025}{misc}{}{}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labeltitlesource}{title}
+      \field{note}{Zuletzt aktualisiert am: 13.05.2025. Zuletzt abgerufen am: 23.05.2025}
+      \field{title}{Datenbank ausw\"{a}hlen: Cloud Firestore oder Realtime Database}
+      \field{year}{13.05.2025}
+      \verb{urlraw}
+      \verb https://firebase.google.com/docs/firestore/rtdb-vs-firestore?hl=de
+      \endverb
+      \verb{url}
+      \verb https://firebase.google.com/docs/firestore/rtdb-vs-firestore?hl=de
+      \endverb
+    \endentry
+    \entry{MoldStud.2025}{misc}{}{}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labeltitlesource}{title}
+      \field{note}{Zuletzt aktualisiert am: 11.05.2025. Zuletzt abgerufen am: 23.05.2025}
+      \field{title}{How Data Models Affect Normalization \& Denormalization in NoSQL Databases}
+      \field{year}{11.05.2025}
+      \verb{urlraw}
+      \verb https://moldstud.com/articles/p-how-data-models-affect-normalization-denormalization-in-nosql-databases
+      \endverb
+      \verb{url}
+      \verb https://moldstud.com/articles/p-how-data-models-affect-normalization-denormalization-in-nosql-databases
+      \endverb
+    \endentry
   \enddatalist
 \endrefsection
 \endinput

@@ -1,18 +1,18 @@
 # Fdb version 4
-["biber docu"] 1747840027.7961 "docu.bcf" "docu.bbl" "docu" 1747840038.9512 0
-  "Literatur_docu.bib" 1747840022 2617 f0661e030e7dd7f08810ee60b43078d2 ""
-  "docu.bcf" 1747840038 108353 32955f805357ecf4c5ea5c2944cf1fb0 "pdflatex"
+["biber docu"] 1748009875.0847 "docu.bcf" "docu.bbl" "docu" 1748009889.93907 0
+  "Literatur_docu.bib" 1748009865 3242 467f561872fabed73b69982903b8f730 ""
+  "docu.bcf" 1748009889 108499 bed17b761a9047dcf6853038b433cb3c "pdflatex"
   (generated)
   "docu.bbl"
   "docu.blg"
   (rewritten before read)
-["makeindex docu.idx"] 1747839768.98456 "docu.idx" "docu.ind" "docu" 1747840038.95085 0
-  "docu.idx" 1747840037 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+["makeindex docu.idx"] 1748009756.15711 "docu.idx" "docu.ind" "docu" 1748009889.93868 0
+  "docu.idx" 1748009888 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   (generated)
   "docu.ilg"
   "docu.ind"
   (rewritten before read)
-["pdflatex"] 1747840034.71551 "docu.tex" "docu.pdf" "docu" 1747840038.95173 0
+["pdflatex"] 1748009885.86723 "docu.tex" "docu.pdf" "docu" 1748009889.93965 0
   "C:/Users/michi/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1747832841 175784 d01d0429261f1720986894a4030d3f6b ""
   "C:/Users/michi/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1744701663 13148213 5de536e2cf3c9b416effffce298c4a28 ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc" 1458473887 4993 80dc9bab7f31fb78a000ccfed0e27cab ""
@@ -49,7 +49,6 @@
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/tfm/public/newtx/ntxsy7.tfm" 1736607165 2000 c8518036fe884fa294a1eeb2da3075ed ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/tfm/public/newtx/ntxsyc.tfm" 1736607165 1028 2f6cbe812325cff65b38e4c0a517f4cb ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/tfm/public/newtx/ntxsym.tfm" 1736607165 1560 755acbe6da75f914298c79fa8bb324fd ""
-  "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/tfm/public/newtxtt/newtxbtta.tfm" 1710669034 1360 b9e1a70a445a7b0e5184bd6c6aa4a6ee ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/tfm/public/newtxtt/newtxtta.tfm" 1710669034 1308 e5c59b96ea4868e0b76c168cd6d7c55b ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/tfm/public/tex-gyre/ec-qhvb.tfm" 1256929440 11796 b7bc3db132e822d2872ea50ba8fa7cc0 ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/tfm/public/tex-gyre/ec-qhvr.tfm" 1256929440 12084 374c5b7e91efcc10472ab8e61f66d36b ""
@@ -57,7 +56,6 @@
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmb.pfb" 1736607166 255251 ff86dd5a515ecd222fc60cb2612549c9 ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb" 1736607166 286816 c3d030d8c7fd436565d9670f5ca64aa0 ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pfb" 1736607166 248316 ea891a047af89fa529ebd24643780319 ""
-  "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtxtt/newtxbtt.pfb" 1710669034 33456 69981075b55a634fbbc459424563f031 ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtxtt/newtxtt.pfb" 1710669034 37195 28ab9ace50af031cbaaab6e4acb4de6b ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-gyre/qhvb.pfb" 1256929440 112164 9a008608d864b5b2b3e09f1772eadc4f ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-gyre/qhvr.pfb" 1256929440 110045 c7ff88f51a7375dc708c2420cc515d9e ""
@@ -300,13 +298,13 @@
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/tex/latex/xpatch/xpatch.sty" 1585221260 8510 7803f78066c4f9d008405191a4b43073 ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/tex/latex/xstring/xstring.sty" 1693735632 123 a302f2c651a95033260db60e51527ae8 ""
   "THA-docu.sty" 1747839886 14220 42d19add6dd8fae33cd637b4c567b242 ""
-  "docu.aux" 1747840038 15637 a4b1c4fe78e9f42d194e2bcf3568ad94 "pdflatex"
-  "docu.bbl" 1747840029 8863 9b2a3b67d6eaf5f9fecf00daeeba634e "biber docu"
-  "docu.ind" 1747839769 0 d41d8cd98f00b204e9800998ecf8427e "makeindex docu.idx"
-  "docu.out" 1747840037 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "docu.run.xml" 1747840038 2501 7ec0e66864133b8a69d40a06c96bae0d "pdflatex"
-  "docu.tex" 1747839732 29706 34e2d07a1c401febc171c2dc22189674 ""
-  "docu.toc" 1747840038 1366 44061042040dc6fbe197677043c5e871 "pdflatex"
+  "docu.aux" 1748009889 16215 bb519057ce5ef9695cbd32337cc5b817 "pdflatex"
+  "docu.bbl" 1748009876 10198 0f8cade6aadc71a35bcba724d40d9341 "biber docu"
+  "docu.ind" 1748009756 0 d41d8cd98f00b204e9800998ecf8427e "makeindex docu.idx"
+  "docu.out" 1748009888 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "docu.run.xml" 1748009889 2501 7ec0e66864133b8a69d40a06c96bae0d "pdflatex"
+  "docu.tex" 1748009694 31436 0250d32fb2b33e0595f6f05370f52b5d ""
+  "docu.toc" 1748009889 1365 bd6391a034826e038e0f27e70fa4bc00 "pdflatex"
   "i18n/de.tex" 1747812780 1682 e3e939d91ad64424f38a02766a3f12d3 ""
   "img/Logo.pdf" 1747812780 62407 11c5a33fdb2a7353a3748cf5cb3e3b5a ""
   "img/SQL_DUMP_ERM.png" 1747825957 155901 fc39074fc43d0706e8d726e0c6d3c302 ""
