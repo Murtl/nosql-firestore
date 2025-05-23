@@ -117,7 +117,7 @@ Abbildung~\ref{fig:enr-old} zeigt das daraus entstandene ER-Diagramm, das insges
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=\dimexpr0.9\linewidth]{img/SQL_DUMP_ERM.png}
+	\includegraphics[width=\dimexpr0.7\linewidth]{img/SQL_DUMP_ERM.png}
 	\caption{Entity-Relationship-Diagramm der ursprünglichen relationalen Struktur}
 	\label{fig:enr-old}
 \end{figure}
@@ -286,9 +286,10 @@ Bei der Umsetzung der Leseabfragen in Firestore traten mehrere Einschränkungen 
 \begin{enumerate}
 	\item \textbf{Keine Unterstützung für JOINs:} 
 	In SQL können Daten aus mehreren Tabellen mithilfe von \texttt{JOIN}-Operationen direkt miteinander verknüpft werden. In Firestore existiert eine solche Funktionalität nicht. Um beispielsweise die Informationen zu einem Angebot gemeinsam mit dem zugehörigen Kurstitel zu laden (wie in Abfrage \textbf{d}), mussten zunächst alle Dokumente aus der Collection \texttt{angebote} gelesen und anschließend für jedes einzelne Dokument das passende Kursdokument aus der Collection \texttt{kurse} manuell nachgeladen werden. Dies führt bei größeren Datenmengen zu einem erheblichen Mehraufwand und einer höheren Anzahl an Leseoperationen – was sich negativ auf die Performance und potenziell auf die Kosten auswirken kann.
-	
-	\item \textbf{Keine Aggregatfunktionen wie \texttt{COUNT}, \texttt{AVG} oder \texttt{GROUP BY}:} 
-	Firestore bietet keine eingebauten Funktionen zur Aggregation von Daten. Eine typische SQL-Abfrage wie „Gib alle Kurse mit mindestens zwei Teilnehmern aus“ (siehe Abfrage \textbf{i}) müsste in SQL lediglich eine Zeile mit \texttt{GROUP BY} und \texttt{HAVING COUNT(*) >= 2} umfassen. In Firestore hingegen musste ein eigenes Zählerobjekt im Anwendungscode erstellt werden, das sämtliche Teilnahme-Dokumente durchläuft und die Anzahl pro Kursangebot manuell berechnet. Das verlagert die Logik vollständig in die Anwendungsebene und erhöht damit den Entwicklungsaufwand.
+	\item \textbf{Eingeschränkte Aggregatfunktionen:}
+    Firestore unterstützt inzwischen einfache Aggregationen wie \texttt{count()}, allerdings nur für die Gesamtanzahl von Dokumenten, die bestimmte Kriterien erfüllen. Komplexe Aggregationen wie \texttt{GROUP BY} oder \texttt{HAVING COUNT(*)}, wie sie in SQL üblich sind, sind in Firestore weiterhin nicht möglich. In Abfrage \textbf{i} (Kurse mit mindestens zwei Teilnehmern) musste daher in Firestore ein eigenes Zählerobjekt im Anwendungscode erstellt werden, das sämtliche Teilnahme-Dokumente durchläuft und die Anzahl pro Kursangebot manuell berechnet. Das verlagert die Logik vollständig in die Anwendungsebene und erhöht damit den Entwicklungsaufwand.
+	% \item \textbf{Keine Aggregatfunktionen wie \texttt{COUNT}, \texttt{AVG} oder \texttt{GROUP BY}:} 
+	% Firestore bietet keine eingebauten Funktionen zur Aggregation von Daten. Eine typische SQL-Abfrage wie „Gib alle Kurse mit mindestens zwei Teilnehmern aus“ (siehe Abfrage \textbf{i}) müsste in SQL lediglich eine Zeile mit \texttt{GROUP BY} und \texttt{HAVING COUNT(*) >= 2} umfassen. In Firestore hingegen musste ein eigenes Zählerobjekt im Anwendungscode erstellt werden, das sämtliche Teilnahme-Dokumente durchläuft und die Anzahl pro Kursangebot manuell berechnet. Das verlagert die Logik vollständig in die Anwendungsebene und erhöht damit den Entwicklungsaufwand.
 \end{enumerate}
 
 % @Gregor hier kannst du gerne noch mehr Sachen einfügen und ausführlicher etc. vlt auch mit Quellen oder iwas noch
