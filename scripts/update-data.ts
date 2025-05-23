@@ -16,24 +16,28 @@ async function aufgabe5() {
      *   🔸 In SQL (PostgreSQL) einfache UPDATE-Anweisung:
      *          UPDATE Angebot SET Datum = DATE + INTERVAL '1 year' WHERE EXTRACT(YEAR FROM Datum) = 2023;
      *   🔹 In Firestore:
-     *          - laden aller Angebote
-     *          - überprüfen aller Angebote ob im Jahr 2023 Angeboten wird
+     *          - laden aller Angebote, bei welchen der Timestamp im Jahr 2023 liegt
      *          - abändern des Datum Strings
      *          - anschließendes updaten in der Datenbank
      * @difference-to-sql
-     *    Firestore kann nicht mit der where Funktion Strings anhand von Substrings filtern, weshalb manuell geprüft werden muss,
-     *    welcher Kurs im Jahr 2023 stattfindet und das Jahr ebenso manuell abgeändert werden muss.
+     *    Laden aller Angebote, welche im Jahr 2023 stattfinden und anschließendes manuelles abändern des Datum, sowie speichern in der Datenbank.
      *    In SQL erfolgt dies automatisch mit der Update-Anweisung
      */
-    const angeboteSnapshot = await db.collection('angebote').withConverter(createConverter<Angebot>()).get();
-    for (const doc of angeboteSnapshot.docs) {
+
+    const startOf2023 = Timestamp.fromDate(new Date("2023-01-01T00:00:00Z"));
+    const startOf2024 = Timestamp.fromDate(new Date("2024-01-01T00:00:00Z"));
+
+    const angebote2023 = await db.collection('angebote')
+        .withConverter(createConverter<Angebot>())
+        .where('Datum', '>=', startOf2023)
+        .where('Datum', '<', startOf2024)
+        .get();
+    for (const doc of angebote2023.docs) {
         const angebot = doc.data();
         const date = angebot.Datum.toDate();
-        if (date.getFullYear() === 2023) {
-            const neuesDatum = Timestamp.fromDate(new Date(date.setFullYear(2024)));
-            await doc.ref.update({Datum: neuesDatum});
-            console.log(`🔄 Angebot ${doc.id} Datum aktualisiert auf ${neuesDatum.toDate().toLocaleDateString()}`);
-        }
+        const neuesDatum = Timestamp.fromDate(new Date(date.setFullYear(2024)));
+        await doc.ref.update({Datum: neuesDatum});
+        console.log(`🔄 Angebot ${doc.id} Datum aktualisiert auf ${neuesDatum.toDate().toLocaleDateString()}`);
     }
 
     // b) Alle Angebote von "Wedel" nach "Augsburg"
