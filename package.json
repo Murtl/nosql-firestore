@@ -5,9 +5,9 @@
   "type": "commonjs",
   "scripts": {
     "load-data": "ts-node scripts/load-data.ts",
-    "read-data": "ts-node scripts/read-data-ts.ts",
-    "update-data": "ts-node scripts/update-data-ts.ts",
-    "delete-data": "ts-node scripts/delete-data-ts.ts"
+    "read-data": "ts-node scripts/read-data.ts",
+    "update-data": "ts-node scripts/update-data.ts",
+    "delete-data": "ts-node scripts/delete-data.ts"
   },
   "repository": {
     "type": "git",

@@ -1,1 +1,1 @@
-@default_files = ('Abschlussarbeit-ohneR.tex');
+@default_files = ('docu.tex');

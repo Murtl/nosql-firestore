@@ -12,16 +12,19 @@ export interface Kurs {
     voraussetzungen?: string[];
 }
 
+export interface RawAngebotJson {
+    KursNr: string;
+    Datum: Timestamp;
+    Ort: string;
+    kursleiter: number[];
+}
+
 export interface Angebot {
     KursNr: string;
     KursTitel: string;
     Datum: Timestamp;
     Ort: string;
-    kursleiter: {
-        PersNr: number;
-        Name: string;
-        Gehalt: number;
-    }[];
+    kursleiter?: Kursleiter[];
 }
 
 export interface Kursleiter {

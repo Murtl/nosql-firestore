@@ -1,6 +1,6 @@
 import fs from 'fs';
-import { Firestore, Timestamp, FirestoreDataConverter } from '@google-cloud/firestore';
-import { Angebot, createConverter, Kurs, Kursleiter, Teilnehmer } from "../data/types";
+import {Firestore, Timestamp, FirestoreDataConverter} from '@google-cloud/firestore';
+import {Angebot, createConverter, Kurs, Kursleiter, RawAngebotJson, Teilnehmer} from "../data/types";
 
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 
@@ -14,51 +14,36 @@ const angebotConverter = createConverter<Angebot>();
 const kursleiterConverter = createConverter<Kursleiter>();
 const teilnehmerConverter = createConverter<Teilnehmer>();
 
-// Kursleiterdaten laden
-const rawKursleiter = fs.readFileSync('data/kursleiter.json', 'utf-8');
-const kursleiterData: Record<string, Kursleiter> = JSON.parse(rawKursleiter);
-const kursleiterCache = new Map<number, Kursleiter>();
-for (const [id, kl] of Object.entries(kursleiterData)) {
-    kursleiterCache.set(Number(id), kl);
-}
-
-// Kursdaten laden
-const rawKurse = fs.readFileSync('data/kurse.json', 'utf-8');
-const kursData: Record<string, Kurs> = JSON.parse(rawKurse);
 const kursTitelMap = new Map<string, string>();
-for (const [id, kurs] of Object.entries(kursData)) {
-    kursTitelMap.set(id, kurs.Titel);
+const kursleiterCache = new Map<number, Kursleiter>();
+
+function loadJsonFile<T>(path: string): Record<string, T> {
+    if (!fs.existsSync(path)) {
+        throw new Error(`Datei nicht gefunden: ${path}`);
+    }
+
+    const raw = fs.readFileSync(path, 'utf-8');
+    return JSON.parse(raw) as Record<string, T>;
 }
 
 async function loadStructuredData<T>(
     collectionName: string,
     filePath: string,
-    converter: FirestoreDataConverter<T>,
-    preprocess?: (doc: any) => T
+    converter: FirestoreDataConverter<T>
 ) {
     console.log(`📄 Lade ${collectionName} aus Datei: ${filePath}`);
 
-    if (!fs.existsSync(filePath)) {
-        console.error(`❌ Datei nicht gefunden: ${filePath}`);
-        return;
-    }
-
     try {
-        const raw = fs.readFileSync(filePath, 'utf-8');
-        const data: Record<string, any> = JSON.parse(raw);
+        const data = loadJsonFile<T>(filePath);
 
-        for (const id of Object.keys(data)) {
-            let document = data[id];
-            if (preprocess) {
-                document = preprocess(document);
-            }
-
+        for (const [id, document] of Object.entries(data)) {
             const docRef = db.collection(collectionName).doc(id).withConverter(converter);
-            await docRef.set(document);
 
-            // Spezialfälle je Collection
             if (collectionName === 'kurse') {
-                const { kursliteratur, voraussetzungen } = data[id] as Kurs;
+                const kurs = document as unknown as Kurs;
+                const { kursliteratur, voraussetzungen, ...rest } = kurs;
+
+                await docRef.set(rest as T);
 
                 if (kursliteratur && Object.keys(kursliteratur).length > 0) {
                     await docRef.collection('kursliteratur').doc('standard').set(kursliteratur);
@@ -69,23 +54,70 @@ async function loadStructuredData<T>(
                         await docRef.collection('voraussetzungen').doc(v).set({ Voraussetzung: v });
                     }
                 }
+
+                kursTitelMap.set(id, kurs.Titel);
             }
 
-            if (collectionName === 'angebote') {
-                const kursleiterArray = document.kursleiter;
-                for (const leiter of kursleiterArray) {
+            else if (collectionName === 'angebote') {
+                const { kursleiter: leiterIds, Datum, KursNr, Ort } = document as RawAngebotJson;
+
+                // Kursleiterdaten aus Cache aufbauen
+                const kursleiterInfos = leiterIds
+                    .map((pid) => {
+                        const k = kursleiterCache.get(pid);
+                        if (!k) {
+                            console.warn(`⚠️ Kursleiter mit PersNr ${pid} nicht im Cache gefunden.`);
+                            return undefined;
+                        }
+                        return {
+                            PersNr: pid,
+                            Name: k.Name,
+                            Gehalt: k.Gehalt
+                        };
+                    })
+                    .filter((k): k is Kursleiter & { PersNr: number } => k !== undefined);
+
+                // KursTitel aus TitelMap
+                const titel = kursTitelMap.get(KursNr) ?? "Unbekannter Kurs";
+
+                const angebotDoc: Omit<Angebot, 'kursleiter'> = {
+                    KursNr,
+                    KursTitel: titel,
+                    Datum: Timestamp.fromDate(new Date(Datum as unknown as string)),
+                    Ort
+                };
+
+                const docRef = db.collection(collectionName).doc(id).withConverter(angebotConverter);
+                await docRef.set(angebotDoc);
+
+                for (const leiter of kursleiterInfos) {
                     await docRef.collection('kursleiter').doc(leiter.PersNr.toString()).set({
-                        PersNr: leiter.PersNr,
+                        Name: leiter.Name,
                         Gehalt: leiter.Gehalt
                     });
                 }
+
             }
 
-            if (collectionName === 'teilnehmer') {
-                for (const teilnahme of data[id].teilnahmen) {
-                    const index: number = data[id].teilnahmen.indexOf(teilnahme);
-                    await docRef.collection('teilnahmen').doc(`teilnahme_${index}`).set(teilnahme);
+            else if (collectionName === 'teilnehmer') {
+                const teilnehmer = document as unknown as Teilnehmer;
+                const { teilnahmen, ...rest } = teilnehmer;
+
+                await docRef.set(rest as T);
+
+                if (teilnahmen && teilnahmen.length > 0) {
+                    for (let i = 0; i < teilnahmen.length; i++) {
+                        await docRef.collection('teilnahmen').doc(`teilnahme_${i}`).set(teilnahmen[i]);
+                    }
                 }
+            }
+
+            else {
+                await docRef.set(document);
+            }
+
+            if (collectionName === 'kursleiter') {
+                kursleiterCache.set(Number(id), document as unknown as Kursleiter);
             }
 
             console.log(`✅ ${collectionName}/${id} gespeichert`);
@@ -110,35 +142,16 @@ async function main() {
         teilnehmerConverter
     );
 
-    await loadStructuredData<Angebot>(
-        'angebote',
-        'data/angebote.json',
-        angebotConverter,
-        (doc) => {
-            const kursleiterInfos = doc.kursleiter.map((pid: number) => {
-                const k = kursleiterCache.get(pid);
-                return {
-                    PersNr: pid,
-                    Name: k?.Name ?? "Unbekannt",
-                    Gehalt: k?.Gehalt ?? 0
-                };
-            });
-
-            const titel = kursTitelMap.get(doc.KursNr) ?? "Unbekannter Kurs";
-
-            return {
-                ...doc,
-                Datum: Timestamp.fromDate(new Date(doc.Datum)),
-                KursTitel: titel,
-                kursleiter: kursleiterInfos
-            };
-        }
-    );
-
     await loadStructuredData<Kursleiter>(
         'kursleiter',
         'data/kursleiter.json',
         kursleiterConverter
+    );
+
+    await loadStructuredData<Angebot>(
+        'angebote',
+        'data/angebote.json',
+        angebotConverter
     );
 
     console.log("✅ Alle Daten erfolgreich geladen.");
