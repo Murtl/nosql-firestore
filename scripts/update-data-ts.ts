@@ -27,13 +27,13 @@ async function aufgabe5() {
     const startOf2023 = Timestamp.fromDate(new Date("2023-01-01T00:00:00Z"));
     const startOf2024 = Timestamp.fromDate(new Date("2024-01-01T00:00:00Z"));
 
-    const angeboteSnapshot = await db.collection('angebote')
+    const angebote2023 = await db.collection('angebote')
         .withConverter(createConverter<Angebot>())
         .where('Datum', '>=', startOf2023)
         .where('Datum', '<', startOf2024)
         .get();
-    console.log(angeboteSnapshot.docs.length)
-    for (const doc of angeboteSnapshot.docs) {
+    console.log(angebote2023.docs.length)
+    for (const doc of angebote2023.docs) {
         const angebot = doc.data();
         const date = angebot.Datum.toDate();
         const neuesDatum = Timestamp.fromDate(new Date(date.setFullYear(2024)));
