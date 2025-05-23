@@ -283,7 +283,7 @@ async function aufgabe4() {
      *
      * @difference-to-sql
      *   - Kein `GROUP BY`/`HAVING` → Aggregation muss manuell erfolgen
-     *   - Kein automatischer Join: Jede Verknüpfung (Teilnahme → Angebot → Kurs) erfordert separate Lookups
+     *   - Kein automatischer Join: Jede Verknüpfung erfordert separate Lookups
      *   - Kein SQL-ähnlicher Ausdruck → erfordert eigene Logik für Zählung, Filterung, Ausgabe
      */
 
@@ -305,7 +305,6 @@ async function aufgabe4() {
     }
 
     // Kurse vorladen: KursNr → Titel
-    const kursesSnap = await db.collection('kurse').withConverter(createConverter<Kurs>()).get();
     const kurseMap = new Map<string, string>();
     for (const doc of kurseSnap.docs) kurseMap.set(doc.id, doc.data().Titel);
 
@@ -362,20 +361,38 @@ async function aufgabe4() {
      *   iteriert und gezählt werden.
      */
     console.log('\n📚 Kurstitel mit Anzahl der Angebote:');
-    const angeboteSnap = await db.collection('angebote').get();
-    const titelCounter = new Map<string, number>();
-    angeboteSnap.docs.forEach(doc => {
-        const { KursTitel } = doc.data() as Angebot;
-        const titel = KursTitel;
-        titelCounter.set(titel, (titelCounter.get(titel) ?? 0) + 1);
+
+    // Kurse laden
+    let kursTitelMap = new Map<string, string>();
+    const angeboteCounter = new Map<string, number>();
+
+    kurseSnap.forEach(doc => {
+        const kursNr = doc.id;
+        const titel = doc.data().Titel;
+        kursTitelMap.set(kursNr, titel);
+        angeboteCounter.set(kursNr, 0); // vorinitialisieren mit 0
     });
-    [...titelCounter.entries()]
-        .sort(([a], [b]) => a.localeCompare(b))
-        .forEach(([titel, count]) =>
-            console.log(`- ${titel}: ${count} Angebote`)
-        );
-    // TODO @Gregor: Was wäre wenn ein Kurs kein Angebot hätte? Dann müsste es ja noch eine Abfrage geben um das
-    //  zu überprüfen, ob eben alle Kurse auch Angebote haben. Das ist hier nicht berücksichtigt.
+
+    // Angebote zählen
+    const angeboteSnap = await db.collection('angebote').get();
+    angeboteSnap.forEach(doc => {
+        const { KursNr } = doc.data() as Angebot;
+        if (angeboteCounter.has(KursNr)) {
+            angeboteCounter.set(KursNr, (angeboteCounter.get(KursNr) ?? 0) + 1);
+        } else {
+            // falls es ein Angebot für einen Kurs gibt, der nicht mehr in 'kurse' existiert
+            angeboteCounter.set(KursNr, 1);
+            kursTitelMap.set(KursNr, KursNr);
+        }
+    });
+
+    // Ausgabe
+    [...angeboteCounter.entries()]
+        .sort(([a], [b]) => (kursTitelMap.get(a) ?? a).localeCompare(kursTitelMap.get(b) ?? b))
+        .forEach(([kursNr, count]) => {
+            const titel = kursTitelMap.get(kursNr) ?? kursNr;
+            console.log(`- ${titel}: ${count} Angebote`);
+        });
 
     // l) Kurstitel mit mindestens 2 Voraussetzungen
     /**
@@ -492,7 +509,7 @@ async function aufgabe4() {
 
     // Kursleiter je KursNr sammeln
     const kursleiterProKurs: Record<string, Map<number, string>> = {}; // KursNr → Map<PersNr, Name>
-    const kursTitelMap = new Map<string, string>();
+    kursTitelMap = new Map<string, string>();
 
     for (const angebot of angeboteSnap.docs) {
         const angebotData = angebot.data();
