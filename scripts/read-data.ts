@@ -102,8 +102,7 @@ async function aufgabe4() {
      *
      * @difference-to-sql
      *   In SQL wird alles in einem JOIN abgebildet.
-     *   In Firestore liegt alles in der Collection 'angebote' und die Kursleiter sind ebenfalls dort redundant
-     *   als Subcollection gespeichert -> macht unsere Datenstruktur möglich.
+     *   In Firestore muss die Subcollection 'kursleiter' für jedes Angebot separat geladen werden. In unserer urpsprünglichen Datenstruktur war das auch für den KursTitel der Fall. Um die Anzahl der Reads zu reduzieren, haben wir den KursTitel in der Collection 'angebote' redundant gespeichert.
      */
     console.log('\n📚 Kurstitel mit Datum, Ort und Kursleiter:');
     for (const angebotDoc of angeboteSnapshot.docs) {
@@ -443,7 +442,7 @@ async function aufgabe4() {
      *       Kurstitel ist bereits als Subcollection direkt im Angebot eingebettet.
      *       Danach Durchschnitt berechnen und sortiert ausgeben.
      * @difference-to-sql
-     *   Kein JOIN oder AVG vorhanden. Um die daraus entstehenden mehrfachen Abfragen zu vermeiden,
+     *   Kein JOIN oder AVG vorhanden. Um die daraus entstehenden mehrfachen Abfragen zu verringern,
      *   wurde mit Redundanz in der Collection `angebote` gearbeitet.
      */
     console.log('\n📚 Durchschnittliches Gehalt der Kursleiter pro Kurs (aufsteigend):');
@@ -503,7 +502,7 @@ async function aufgabe4() {
      *       und mit dem redundanten `KursTitel` direkt ausgeben.
      * @difference-to-sql
      *   Kein Self-Join möglich – Paare müssen im Client konstruiert werden.
-     *   Dank Redundanz in 'angebote' sind keine Subcollection- oder Zusatzabfragen auf `kursleiter` oder `kurse` nötig.
+     *   Dank Redundanz des Kurstitels in 'angebote' konnten die zusätzlichen Abfragen verringert werden.
      */
     console.log('\n👩‍🏫 Kursleiter-Paare für denselben Kurs:');
 
