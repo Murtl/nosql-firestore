@@ -261,55 +261,58 @@ async function aufgabe4() {
 
     // i) Kurse mit mindestens 2 Teilnehmern
     /**
-     * @old-relational-table Nimmt_teil, Kurs, Angebot
-     * @collections teilnehmer, teilnehmer/{id}/teilnahmen , angebote, kurse
+     * @old-relational-table Nimmt_teil, Angebot, Kurs
+     * @collections teilnehmer, teilnehmer/{id}/teilnahmen, angebote, kurse
+     *
      * @logic
      * 🔸 In SQL:
      *   SELECT k.Titel, COUNT(*) AS Anzahl
      *   FROM Nimmt_teil nt
      *   JOIN Angebot a ON nt.AngNr = a.AngNr
      *   JOIN Kurs k ON a.KursNr = k.KursNr
-     *   GROUP BY nt.AngNr
+     *   GROUP BY a.KursNr
      *   HAVING COUNT(*) >= 2;
      *
      * 🔹 In Firestore:
-     *   - Für jeden Teilnehmer `teilnehmer/{TnNr}` die Subcollection `teilnahmen` lesen
-     *   - Für jede Teilnahme: `AngNr` zählen (Counter-Map)
-     *   - Nur Angebote mit ≥ 2 Einträgen verwenden
-     *   - Jeweils dazugehöriges `angebot` und `kurs` per ID nachladen
-     *   - Ausgabe: Kurstitel + Teilnehmeranzahl
+     *   - Alle `angebote` laden → Map: Angebot-ID → KursNr
+     *   - Alle Teilnehmer durchlaufen
+     *   - Für jede Teilnahme in `teilnehmer/{id}/teilnahmen` → `AngNr` zählen
+     *   - Aggregation in Counter-Map: KursNr → Anzahl Teilnehmer
+     *   - Alle `kurse` laden → KursNr → Titel
+     *   - Ausgabe: Kurse mit mindestens 2 Teilnehmern
      *
      * @difference-to-sql
-     *   - Kein GROUP BY oder HAVING in Firestore → Zählung erfolgt manuell im Code
-     *   - Kein Join zwischen Teilnahme, Angebot, Kurs → alles muss mit separaten `.get()`-Operationen verknüpft werden
-     *   - Mehrere Lesezugriffe pro Ergebnis → langsamer & komplexer
+     *   - Kein `GROUP BY`/`HAVING` → Aggregation muss manuell erfolgen
+     *   - Kein automatischer Join: Jede Verknüpfung (Teilnahme → Angebot → Kurs) erfordert separate Lookups
+     *   - Kein SQL-ähnlicher Ausdruck → erfordert eigene Logik für Zählung, Filterung, Ausgabe
      */
+
     console.log('\n📚 Kurse mit mindestens 2 Teilnehmern (alle Angebote zusammengefasst):');
+    const angebotesSnap = await db.collection('angebote').get();
+    const angeboteMap = new Map<string, string>();
+    for (const doc of angebotesSnap.docs) {
+        angeboteMap.set(doc.id, doc.data().KursNr);
+    }
 
-    // Zähle Teilnehmer pro KursNr
-    const kursTeilnehmerCounter: Record<string, number> = {};
-
+    // Teilnehmer durchgehen und pro KursNr zählen
+    const kursCounter: Record<string, number> = {};
     for (const tnDoc of teilnehmerSnap.docs) {
         const teilnahmenSnap = await tnDoc.ref.collection('teilnahmen').get();
-
-        for (const teilnahme of teilnahmenSnap.docs) {
-            const angebotId = teilnahme.data().AngNr as string;
-            const angebotSnap = await db.collection('angebote').doc(angebotId).get();
-
-            if (!angebotSnap.exists) continue;
-
-            const kursNr = angebotSnap.data()?.KursNr;
-            if (!kursNr) continue;
-
-            kursTeilnehmerCounter[kursNr] = (kursTeilnehmerCounter[kursNr] || 0) + 1;
+        for (const t of teilnahmenSnap.docs) {
+            const kursNr = angeboteMap.get(t.data().AngNr);
+            if (kursNr) kursCounter[kursNr] = (kursCounter[kursNr] || 0) + 1;
         }
     }
 
+    // Kurse vorladen: KursNr → Titel
+    const kursesSnap = await db.collection('kurse').withConverter(createConverter<Kurs>()).get();
+    const kurseMap = new Map<string, string>();
+    for (const doc of kurseSnap.docs) kurseMap.set(doc.id, doc.data().Titel);
+
     // Ausgabe nach KursNr
-    for (const [kursNr, count] of Object.entries(kursTeilnehmerCounter)) {
+    for (const [kursNr, count] of Object.entries(kursCounter)) {
         if (count >= 2) {
-            const kursSnap = await db.collection('kurse').doc(kursNr).withConverter(createConverter<Kurs>()).get();
-            const titel = kursSnap.exists ? kursSnap.data()?.Titel : kursNr;
+            const titel = kurseMap.get(kursNr) || kursNr;
             console.log(`- ${titel}: ${count} Teilnehmer`);
         }
     }
