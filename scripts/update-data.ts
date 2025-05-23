@@ -32,7 +32,6 @@ async function aufgabe5() {
             .where('Datum', '>=', startOf2023)
             .where('Datum', '<', startOf2024)
             .get();
-        console.log(angebote2023.docs.length)
         for (const doc of angebote2023.docs) {
             const angebot = doc.data();
             const date = angebot.Datum.toDate();
