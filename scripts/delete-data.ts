@@ -118,6 +118,11 @@ async function aufgabe6() {
         const angebotId = angebotDoc.id;
         const teilnehmerAnzahl = angebotTeilnahmeZaehler[angebotId] || 0;
         if (teilnehmerAnzahl < 2) {
+            await angebotDoc.ref.collection('kursleiter').get().then(kursleiterSnap => {
+                // Lösche alle Kursleiter für dieses Angebot
+                const deletePromises = kursleiterSnap.docs.map(k => k.ref.delete());
+                return Promise.all(deletePromises);
+            });
             await angebotDoc.ref.delete();
             zuLoeschendeAngebote.push(angebotId);
             console.log(`🗑️ Angebot ${angebotId} gelöscht (nur ${teilnehmerAnzahl} Teilnehmer).`);
