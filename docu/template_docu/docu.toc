@@ -12,6 +12,5 @@
 \contentsline {chapter}{\numberline {5}Herausforderungen bei den Read-Abfragen}{12}{chapter.5}%
 \contentsline {chapter}{\numberline {6}Herausforderungen bei den Update-Abfragen}{14}{chapter.6}%
 \contentsline {chapter}{\numberline {7}Herausforderungen bei den Delete-Abfragen}{15}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Fazit}{16}{chapter.8}%
-\contentsline {chapter}{\nonumberline Literaturverzeichnis}{17}{chapter*.9}%
+\contentsline {chapter}{\numberline {8}Fazit}{17}{chapter.8}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
