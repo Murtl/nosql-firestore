@@ -98,13 +98,59 @@ async function aufgabe6() {
      * - Zählung und Selektion müssen manuell in der Applikation durchgeführt werden.
      * - Zudem erfolgt die Navigation zu "teilnahmen" über die Subcollection jedes Teilnehmers.
      */
+
+      const angeboteSnapshot = await db.collection('angebote').withConverter(createConverter<Angebot>()).get();
+      const teilnehmerSnapshot = await db.collection('teilnehmer').withConverter(createConverter<Teilnehmer>()).get();
+
+      const angebotTeilnahmeZaehler: Record<string, number> = {};
+      const zuLoeschendeAngebote: string[] = [];
+
+      // Zähle die Teilnehmer pro Angebot
+      for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
+          const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
+          for (const t of teilnahmenSnap.docs) {
+              const { AngNr } = t.data() as Teilnahme;
+              angebotTeilnahmeZaehler[AngNr] = (angebotTeilnahmeZaehler[AngNr] || 0) + 1;
+          }
+      }
+
+      // Lösche Angebote mit < 2 Teilnehmern und merke dir die AngNr_KursNr
+      for (const angebotDoc of angeboteSnapshot.docs) {
+          const angebotId = angebotDoc.id;
+          const teilnehmerAnzahl = angebotTeilnahmeZaehler[angebotId] || 0;
+          if (teilnehmerAnzahl < 2) {
+              await angebotDoc.ref.collection('kursleiter').get().then(kursleiterSnap => {
+                  // Lösche alle Kursleiter für dieses Angebot
+                  const deletePromises = kursleiterSnap.docs.map(k => k.ref.delete());
+                  return Promise.all(deletePromises);
+              });
+              await angebotDoc.ref.delete();
+              zuLoeschendeAngebote.push(angebotId);
+              console.log(`🗑️ Angebot ${angebotId} gelöscht (nur ${teilnehmerAnzahl} Teilnehmer).`);
+          }
+      }
+
+      // Lösche zugehörige Teilnahmen in allen Teilnehmer-Dokumenten
+      for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
+          const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
+          for (const t of teilnahmenSnap.docs) {
+              const { AngNr } = t.data() as Teilnahme;
+              if (zuLoeschendeAngebote.includes(AngNr)) {
+                  await t.ref.delete();
+                  console.log(`🗑️ Teilnahme ${t.id} von Teilnehmer ${teilnehmerDoc.id} gelöscht (bezog sich auf Angebot ${AngNr}).`);
+              }
+          }
+      }
+
+
+  /*
+    // Hinweis: Zusatz zu Aufgabe b - Löschen von Angeboten mit <2 Teilnehmern
+    // Transaktion und Batch-Operationen für konsistente Löschvorgänge bei großen Datenmengen
     const angeboteSnapshot = await db.collection('angebote').withConverter(createConverter<Angebot>()).get();
     const teilnehmerSnapshot = await db.collection('teilnehmer').withConverter(createConverter<Teilnehmer>()).get();
 
-    const angebotTeilnahmeZaehler: Record<string, number> = {};
-    const zuLoeschendeAngebote: string[] = [];
-
     // Zähle die Teilnehmer pro Angebot
+    const angebotTeilnahmeZaehler: Record<string, number> = {};
     for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
         const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
         for (const t of teilnahmenSnap.docs) {
@@ -113,35 +159,55 @@ async function aufgabe6() {
         }
     }
 
-    // Lösche Angebote mit < 2 Teilnehmern und merke dir die AngNr_KursNr
-    for (const angebotDoc of angeboteSnapshot.docs) {
-        const angebotId = angebotDoc.id;
-        const teilnehmerAnzahl = angebotTeilnahmeZaehler[angebotId] || 0;
-        if (teilnehmerAnzahl < 2) {
-            await angebotDoc.ref.collection('kursleiter').get().then(kursleiterSnap => {
-                // Lösche alle Kursleiter für dieses Angebot
-                const deletePromises = kursleiterSnap.docs.map(k => k.ref.delete());
-                return Promise.all(deletePromises);
-            });
-            await angebotDoc.ref.delete();
-            zuLoeschendeAngebote.push(angebotId);
-            console.log(`🗑️ Angebot ${angebotId} gelöscht (nur ${teilnehmerAnzahl} Teilnehmer).`);
-        }
-    }
+    const zuLoeschendeAngebote: string[] = [];
 
-    // Lösche zugehörige Teilnahmen in allen Teilnehmer-Dokumenten
+    await db.runTransaction(async (transaction) => {
+    for (const angebotDoc of angeboteSnapshot.docs) {
+              const angebotId = angebotDoc.id;
+              const teilnehmerAnzahl = angebotTeilnahmeZaehler[angebotId] || 0;
+
+              if (teilnehmerAnzahl < 2) {
+                  const kursleiterSnap = await angebotDoc.ref.collection('kursleiter').get();
+                  kursleiterSnap.docs.forEach(kursleiterDoc => {
+                      transaction.delete(kursleiterDoc.ref);
+                  });
+
+                  transaction.delete(angebotDoc.ref);
+                  zuLoeschendeAngebote.push(angebotId);
+
+                  console.log(`🗑️ Angebot ${angebotId} gelöscht in Transaktion (nur ${teilnehmerAnzahl} Teilnehmer).`);
+              }
+          }
+      });
+
+    // BATCH: Lösche verknüpfte Teilnahmen
+    let batch = db.batch();
+    let opCount = 0;
+    const MAX_BATCH_OPS = 490;
+
     for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
         const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
-        for (const t of teilnahmenSnap.docs) {
-            const { AngNr } = t.data() as Teilnahme;
+        for (const teilnahmeDoc of teilnahmenSnap.docs) {
+            const { AngNr } = teilnahmeDoc.data() as Teilnahme;
             if (zuLoeschendeAngebote.includes(AngNr)) {
-                await t.ref.delete();
-                console.log(`🗑️ Teilnahme ${t.id} von Teilnehmer ${teilnehmerDoc.id} gelöscht (bezog sich auf Angebot ${AngNr}).`);
+                batch.delete(teilnahmeDoc.ref);
+                console.log(`🗑️ Teilnahme ${teilnahmeDoc.id} gelöscht (bezog sich auf Angebot ${AngNr}).`);
+
+                opCount++;
+                if (opCount >= MAX_BATCH_OPS) {
+                    await batch.commit();
+                    batch = db.batch();
+                    opCount = 0;
+                }
             }
         }
     }
+    if (opCount > 0) {
+        await batch.commit();
+    }
+   */
 
-    console.log('\n✅ Löschvorgänge abgeschlossen.');
+console.log('\n✅ Löschvorgänge abgeschlossen.');
 }
 
 aufgabe6().catch(console.error);
