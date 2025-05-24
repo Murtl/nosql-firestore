@@ -10,24 +10,34 @@ async function aufgabe6() {
 
     // a) Lösche die Kursliteratur für "C-Programmierung"
     /**
-     * @old-relational-table KursLit
+     * @old-relational-table Kurs, KursLiteratur
      * @collections kurse, kurse/kursliteratur
+     *
      * @id
      *   In "kurse": Dokumenten-ID = KursNr (z.B.: "P13")
      *   In Subcollection "kursliteratur": Dokumenten-ID = "standard"
+     *
      * @logic
      *   🔸 In SQL:
-     *       DELETE FROM KursLit WHERE KursNr = 'P13';
+     *      Ermittle KursNr für den Kurs mit Titel "C-Programmierung"
+     *          SELECT KursNr FROM Kurs WHERE Titel = 'C-Programmierung';
+     *      Lösche die zugehörige Literatur:
+     *          DELETE FROM KursLiteratur WHERE KursNr = 'P13';
+     *
      *   🔹 In Firestore:
-     *       Kurs mit Titel "C-Programmierung" (entspricht KursNr = "P13") wird gesucht,
-     *       dann wird `kurse/P13/kursliteratur/standard` gelöscht.
+     *      1. Suche im Collection "kurse" nach einem Dokument mit Feld `Titel` == "C-Programmierung".
+     *      2. Greife auf das Dokument `kursliteratur/standard` innerhalb des gefundenen Kurses zu.
+     *      3. Lösche das Dokument `standard` in der Subcollection `kursliteratur`.
+     *
      * @risk
-     *   🔸 In SQL: Datenlöschung wird automatisch in Beziehung gesetzt – z.B.: kann überprüft werden, ob Bedarf noch besteht.
-     *   🔹 In Firestore: Es erfolgt keine automatische Prüfung, ob Literatur z.B.: noch in Gebrauch ist (z.B.: durch Angebote oder Teilnehmer).
-     *       Das Löschen erfolgt direkt auf Dokumentebene.
+     * Es gibt keine automatische Prüfung oder Foreign-Key-Beziehungen:
+     * - Die Literatur kann gelöscht werden, auch wenn sie noch z.B. in einem Angebot verwendet wird.
+     * - Entwickler müssen selbst für Konsistenz sorgen.
+     *
      * @difference-to-sql
-     *   In SQL reicht eine einfache WHERE-Klausel; in Firestore ist eine Suche nach dem Titel nötig,
-     *   gefolgt vom Zugriff auf eine Subcollection mit fixer ID ("standard").
+     * In SQL genügt ein einfacher `DELETE` mit WHERE-Klausel über `KursNr`.
+     * In Firestore ist eine Suche nach dem Titel erforderlich,
+     * gefolgt vom Zugriff auf die Subcollection `kursliteratur`, um das "standard"-Dokument zu löschen.
      */
     const kursSnapshot = await db.collection('kurse')
         .withConverter(createConverter<Kurs>())
@@ -44,35 +54,57 @@ async function aufgabe6() {
 
     // b) Lösche alle Kursangebote mit weniger als 2 Teilnehmern
     /**
-     * @old-relational-table Nimmt_teil, Angebot
-     * @collections angebote, teilnehmer
+     * @old-relational-table Nimmt_teil, Angebot, Gebühren
+     * @collections angebote, teilnehmer, teilnehmer/teilnahmen
+     *
      * @id
      *   In "angebote": Dokumenten-ID = AngNr_KursNr (z.B.: "2_P13")
      *   In "teilnehmer": Dokumenten-ID = TnNr
      *   In Subcollection "teilnahmen": Feld AngNr_KursNr referenziert Angebot
-     * @delete Nur das Dokument in "angebote" wird gelöscht
+     *
      * @logic
      *   🔸 In SQL:
-     *       DELETE FROM Angebot WHERE (AngNr, KursNr) IN (
-     *           SELECT AngNr, KursNr FROM Nimmt_teil GROUP BY AngNr, KursNr HAVING COUNT(*) < 2
-     *       );
+     *      Finde Angebote mit weniger als 2 Teilnehmern:
+     *             SELECT A.AngNr
+     *             FROM Angebot A
+     *             JOIN Nimmt_teil NT ON A.AngNr = NT.AngNr
+     *             GROUP BY A.AngNr
+     *             HAVING COUNT(*) < 2;
+     *
+     *      Lösche die Einträge in "Nimmt_teil" und "Gebuehren":
+     *             DELETE FROM Nimmt_teil WHERE AngNr = <zu löschende AngNr>;
+     *             DELETE FROM Gebuehren WHERE AngNr = <zu löschende AngNr>;
+     *
+     *      Lösche das Angebot:
+     *             DELETE FROM Angebot WHERE AngNr = <zu löschende AngNr>;
+     *
      *   🔹 In Firestore:
-     *       - Iteriere über alle Teilnehmer → analysiere ihre Teilnahmen.
-     *       - Zähle Vorkommen jedes Angebots.
-     *       - Lösche jedes Angebot aus "angebote", wenn es < 2 Teilnehmer hat.
+     *       1. Lade alle Dokumente aus "angebote" und "teilnehmer".
+     *       2. Zähle pro Angebot, wie viele Teilnehmer eine Teilnahme mit der entsprechenden AngNr_KursNr haben.
+     *       3. Wenn die Anzahl < 2, lösche:
+     *                - das Angebot selbst
+     *                - alle zugehörigen "teilnahmen"
      * @risk
-     *   🔸 In SQL: Foreign Keys und CASCADE-Löschungen sichern Konsistenz.
-     *   🔹 In Firestore: Nur das Angebot wird gelöscht.
-     *       Referenzen in "teilnehmer" (teilnahmen), "gebuehren", oder "fuehrt_durch" bleiben bestehen → Inkonsistenzrisiko!
+     * In Firestore gibt es keine referenzielle Integrität:
+     *      - Teilnahmen, die auf nicht existierende Angebote zeigen, müssen manuell bereinigt werden.
+     *      - Ein versehentliches Löschen kann nicht durch Constraints verhindert werden.
+     *      - Entwickler müssen sicherstellen, dass keine "verwaisten" Dokumente entstehen.
+     *      - Ohne Transaktionen oder Batch-Operationen kann es zu Inkonsistenzen beim Löschen kommen
+     *
      * @difference-to-sql
-     *   Firestore hat kein GROUP BY oder Aggregation.
-     *   Zählung und Selektion müssen manuell in der Applikation durchgeführt werden.
+     * - In Firestore gibt es KEIN JOIN + WHERE + DELETE + GROUP BY oder CASCADEN-Delete.
+     * - In SQL kann man JOINS und Bedingungen direkt im DELETE kombinieren.
+     * - In Firestore müssen Dokumente einzeln geladen und verglichen werden.
+     * - Zählung und Selektion müssen manuell in der Applikation durchgeführt werden.
+     * - Zudem erfolgt die Navigation zu "teilnahmen" über die Subcollection jedes Teilnehmers.
      */
     const angeboteSnapshot = await db.collection('angebote').withConverter(createConverter<Angebot>()).get();
     const teilnehmerSnapshot = await db.collection('teilnehmer').withConverter(createConverter<Teilnehmer>()).get();
 
     const angebotTeilnahmeZaehler: Record<string, number> = {};
+    const zuLoeschendeAngebote: string[] = [];
 
+    // Zähle die Teilnehmer pro Angebot
     for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
         const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
         for (const t of teilnahmenSnap.docs) {
@@ -81,12 +113,26 @@ async function aufgabe6() {
         }
     }
 
+    // Lösche Angebote mit < 2 Teilnehmern und merke dir die AngNr_KursNr
     for (const angebotDoc of angeboteSnapshot.docs) {
         const angebotId = angebotDoc.id;
         const teilnehmerAnzahl = angebotTeilnahmeZaehler[angebotId] || 0;
         if (teilnehmerAnzahl < 2) {
             await angebotDoc.ref.delete();
+            zuLoeschendeAngebote.push(angebotId);
             console.log(`🗑️ Angebot ${angebotId} gelöscht (nur ${teilnehmerAnzahl} Teilnehmer).`);
+        }
+    }
+
+    // Lösche zugehörige Teilnahmen in allen Teilnehmer-Dokumenten
+    for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
+        const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
+        for (const t of teilnahmenSnap.docs) {
+            const { AngNr } = t.data() as Teilnahme;
+            if (zuLoeschendeAngebote.includes(AngNr)) {
+                await t.ref.delete();
+                console.log(`🗑️ Teilnahme ${t.id} von Teilnehmer ${teilnehmerDoc.id} gelöscht (bezog sich auf Angebot ${AngNr}).`);
+            }
         }
     }
 
