@@ -326,18 +326,20 @@ Trotzdem bleibt zu beachten, dass Firestore keine automatische Änderungsweiterg
 \chapter{Herausforderungen bei den Delete-Abfragen}
 \label{delete-label}
 
-% @Jana das ist obv noch komplett falsch hier, geht aber um die Theorie etc, pass das bitte an auf unser Projekt und vlt ist was sinnvolles dabei + maybe Quellen?
 Neben der Aktualisierung redundanter Daten stellt auch das Löschen von Dokumenten in Firestore eine besondere Herausforderung dar – insbesondere dann, wenn Daten mehrfach gespeichert oder in Sub-Collections organisiert sind.
 
-Ein typisches Beispiel ist das Löschen eines Kurses: Während in einer relationalen Datenbank mit referenzieller Integrität und \texttt{ON DELETE CASCADE} automatisch alle abhängigen Einträge (z.\,B. Angebote oder Teilnahmen) entfernt werden können, existiert eine solche automatische Löschkaskade in Firestore nicht.
+Ein typisches Beispiel im Rahmen dieses Projekts ist das Löschen von einem Angebot. Während in einer relationalen Datenbank mit referenzieller Integrität und \texttt{ON DELETE CASCADE} automatisch alle abhängigen Einträge (z.\,B. zugehörige Teilnahmen oder Gebühren) entfernt werden können, existiert eine solche automatische Löschkaskade in Firestore nicht.
 
-Wird ein Dokument in einer Haupt-Collection gelöscht (z.\,B. ein Kurs), so bleiben zugehörige Dokumente in Sub-Collections oder redundanten Kopien (etwa in \texttt{angebote.kursleiter}) bestehen – es sei denn, sie werden explizit mitgelöscht. Das kann zu Inkonsistenzen und veralteten Daten führen, wenn keine zusätzliche Logik zur Datenpflege implementiert wird.
+Wird ein Dokument in einer Haupt-Collection gelöscht (z.\,B. das Angebot für einen bestimmten Kurs), so bleiben zugehörige Dokumente in Sub-Collections oder redundanten Kopien (etwa in \texttt{Teilnehmer/Teilnahmen}) bestehen – es sei denn, sie werden explizit mitgelöscht. Das kann zu Inkonsistenzen und verwaisten Daten führen, wenn keine zusätzliche Logik zur Datenpflege implementiert wird.
 
-Zur Umsetzung konsistenter Löschvorgänge haben wir daher ein eigenes Skript verwendet, das beim Entfernen eines Hauptdokuments auch alle zugehörigen Sub-Dokumente und Kopien löscht. Firestore bietet hierfür keine eingebaute Funktion, aber durch den Einsatz von sogenannten \texttt{batch}– oder \texttt{recursive delete}-Operationen in Kombination mit manueller Traversierung der Dokumentstruktur lässt sich diese Funktionalität nachbilden.
+Zur Umsetzung konsistenter Löschvorgänge muss also anhand einer eigenen Lösch-Logik-Implementierung festgelegt werden, dass alle zugehörigen Dokumente, Sub-Dokumente und Kopien ebenfalls gelöscht werden. Um dies zu verdeutlichen, beziehen wir uns direkt auf das Löschen eines Angebots in diesem Projekt. In diesem Fall muss nicht nur das Angebot selbst, sondern zusätzlich alle zugehörigen Teilnahmen und Gebühren entfernt werden.
+Ein Vorteil unserer Datenspeicherung liegt in der Speicherung der Teilnahme zusammen mit den Gebühren direkt im \texttt{Teilnehmer}-Dokument. Dadurch müssen wir lediglich die zughörigen Teilnahmen, vom betroffenen Angebot löschen, um auch die Gebühren zu entfernen.
 
-Alternativ könnte man auch auf serverseitige Mechanismen wie \textit{Firebase Cloud Functions} zurückgreifen, die automatisch auf Datenänderungen reagieren können. Diese Lösung war in unserem Projekt jedoch nicht erlaubt, da wir ausschließlich lokal mit der Emulator Suite arbeiten durften und auf Cloud-Integrationen verzichten mussten.
+Da hier grundsätzlich oft ein hoher Aufwand von Schleifen-Operationen (z.\,B. for-Schleifen) und darin enthaltenen Löschvorgängen zu Grunde liegt, bietet sich das Konzept der \texttt{Transaktionen} und \texttt{batch}-Operationen \cite{Firebase.TransaktionenBatch} in Kombination für die Durchführung der Lösch-Operation an. Firestore ermöglicht es, mehrere Löschvorgänge in einer Transaktion zu bündeln, sodass sie entweder alle erfolgreich ausgeführt oder im Fehlerfall zurückgerollt werden. Dies stellt sicher, dass die Datenbank in einem konsistenten Zustand bleibt und keine Teilergebnisse hinterlässt.
+Dabei gilt es zu beachten, dass Firestore vorgibt, dass Lese-Operationen immer vor Schreib-Operationen in den Transaktionen stehen müssen und eine maximale Anfragegröße von 10 Mebibyte (MiB) pro Transaktion gilt.
+Alternativ könnte mit einem serverseitigen Mechanismus \textit{Firebase Cloud Functions} \cite{Firebase.CloudFunctions} gearbeitet werden. Diese Functions reagieren automatisch auf Datenänderungen - wie beispielsweise in diesem Projekt einen Löschvorgang eines Angebots. Diese Lösung war in unserem Projekt jedoch nicht erlaubt, da ausschließlich lokal mit der Emulator Suite gearbeitet wird und dementsprechend keine Cloud-Integrationen erlaubt sind.
 
-Somit liegt die Verantwortung für konsistentes Löschen bei der Anwendungsschicht – ein bedeutender Unterschied zu relationalen Systemen, der insbesondere bei komplexeren Datenmodellen berücksichtigt werden muss.
+Somit liegt die Verantwortung für konsistentes Löschen bei der Anwendungsschicht. Diese Tatsache ist ein bedeutender Unterschied zu relationalen Systemen, der insbesondere bei komplexeren Datenmodellen berücksichtigt werden muss.
 
 \chapter{Fazit}
 
