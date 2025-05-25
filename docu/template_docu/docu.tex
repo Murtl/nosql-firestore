@@ -304,15 +304,24 @@ Diese Einschränkungen zeigen exemplarisch, dass NoSQL-Systeme wie Firestore zwa
 % @Peter, dass hier ist obv nicht richtig und nur für die Theorie generiert, pass das bitte auf unser Projekt mit Quellen von offizieler Firebase Doku z.B. zu batch writes und transaktionen
 Ein wesentliches Merkmal dokumentenbasierter NoSQL-Datenbanken wie Firestore ist die bewusste Entscheidung für Redundanz, um Abfragen zu beschleunigen und komplexe JOINs zu vermeiden. Diese Modellierungsfreiheit bringt jedoch Herausforderungen mit sich – insbesondere bei \texttt{update}-Operationen.
 
+Konkret bezogen auf die Aufgabenstellung, gab es keine \texttt{update}-Operation, welche über mehr als eine Collection hinaus ging, weshalb die \texttt{update}-Operationen sehr intuitiv ausfallen. Um dennoch mögliche Herausforderungen zu erläutern, welche bei \texttt{update}-Operationen auftreten können, wird ein zusätzliches Beispiel betrachtet.
+
 Ein konkretes Beispiel in unserem Projekt ist der redundante \texttt{KursTitel}, der sowohl in der Collection \texttt{kurse} als auch mehrfach in der Collection \texttt{angebote} gespeichert wird. Wird der Titel eines Kurses geändert, muss sichergestellt werden, dass alle zugehörigen Angebote ebenfalls aktualisiert werden, um Inkonsistenzen zu vermeiden.
 
 In relationalen Datenbanken würde dies durch eine zentrale Normalisierung und Fremdschlüsselbeziehungen automatisch sichergestellt werden. In Firestore hingegen ist die Konsistenz zwischen redundanten Feldern Aufgabe der Anwendung.
 
-Zur Lösung dieses Problems bietet Firestore sogenannte \textit{Batch Writes} und \textit{Transaktionen} an. Bei einem Batch Write können mehrere Dokumente in einem einzigen atomaren Schritt aktualisiert werden. Transaktionen ermöglichen zusätzlich, innerhalb eines Konsistenzkontextes zu lesen und zu schreiben – was insbesondere dann hilfreich ist, wenn Bedingungen geprüft werden müssen, bevor geschrieben wird.
+Zur Lösung dieses Problems bietet Firestore sogenannte \textit{Batch Writes} und \textit{Transaktionen} an. Bei einem Batch Write können mehrere Dokumente in einem einzigen atomaren Schritt aktualisiert werden. Transaktionen ermöglichen zusätzlich, innerhalb eines Konsistenzkontextes zu lesen und zu schreiben – was insbesondere dann hilfreich ist, wenn Bedingungen geprüft werden müssen, wie zuvor im konkreten Fall der \texttt{KursTitel} beschrieben wurde. \cite{FirebasebaseTransaktionenBatches.2025}
 
-In unserem Projekt war der Einsatz von \texttt{Batch Writes} die bevorzugte Methode, da wir genau wussten, welche Felder aktualisiert werden müssen und keine Abhängigkeiten zwischen den Lese- und Schreibvorgängen bestanden. Änderungen am Kurstitel konnten so gezielt auf alle betroffenen \texttt{angebote}-Dokumente angewendet werden.
+In dem vorher erläutertem Beispiel ist der Einsatz von \texttt{Transaktionen} die bevorzugte Methode, da bekannt ist, welche Felder aktualisiert werden müssen und keine Abhängigkeiten zwischen den Lese- und Schreibvorgängen bestehen. Änderungen am Kurstitel konnten so gezielt auf alle betroffenen \texttt{angebote}-Dokumente angewendet werden.
 
-Trotzdem bleibt zu beachten, dass Firestore keine automatische Änderungsweitergabe (wie \texttt{ON UPDATE CASCADE} in SQL) unterstützt. Entwickler:innen müssen sich dieser Limitierung bewusst sein und gegebenenfalls eigene Routinen oder Skripte entwickeln, um die Konsistenz sicherzustellen.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{img/BatchUpdate.png}
+	\caption{Beispiel für Updates mit Batch}
+	\label{fig:code-example-0}
+\end{figure}
+
+Trotzdem bleibt zu beachten, dass Firestore keine automatische Änderungsweitergabe (wie \texttt{ON UPDATE CASCADE} in SQL) unterstützt. Entwickler müssen sich dieser Limitierung bewusst sein und gegebenenfalls eigene Routinen oder Skripte entwickeln, um die Konsistenz sicherzustellen.
 
 \chapter{Herausforderungen bei den Delete-Abfragen}
 \label{delete-label}
