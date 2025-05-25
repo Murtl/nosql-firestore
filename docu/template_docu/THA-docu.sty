@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}[1994/06/01]
-\ProvidesPackage{THA-Abschlussarbeit}[2024/01/08 package to provide a great standard config for a thesis at the THA]
+\ProvidesPackage{THA-docu}[2024/01/08 package to provide a great standard config for a thesis at the THA]
 
 \RequirePackage{xparse}
 \RequirePackage{xcolor}
@@ -10,12 +10,15 @@
 
 \RequirePackage{scrhack}
 \RequirePackage{blindtext}
-\RequirePackage[
-colorlinks=true
-]{hyperref}
+%\RequirePackage[
+%colorlinks=true
+%]{hyperref}
 \RequirePackage{kvoptions}
 
-\RequirePackage{url}
+\PassOptionsToPackage{hyphens}{url}   % Option zuerst registrieren
+\RequirePackage{hyperref}            % hyperref lädt url automatisch
+% \RequirePackage{url} ← Nicht mehr nötig!
+%\RequirePackage{url}
 \RequirePackage{booktabs, tabularx}
 \RequirePackage{multirow}
 
@@ -120,11 +123,12 @@ colorlinks=true
 \usepackage[babel,autostyle]{csquotes}
 \usepackage[%
     backend=biber,
-    style=authoryear,
+    %style=authoryear,
+    style=ieee,
     dashed=false,
     sortlocale=de_DE,
     natbib=true,
-    url=false, 
+    url=true, 
     isbn=false,
     eprint=false,
     bibencoding=utf8,
@@ -138,7 +142,7 @@ colorlinks=true
     backrefstyle=three
 ]{biblatex}
 \DeclareBibliographyCategory{Buch} 
-\addbibresource{Literatur_Abschlussarbeit.bib}
+\addbibresource{Literatur_docu.bib}
 \renewcommand{\bibfont}{\small}
 \renewcommand*{\nameyeardelim}{\addspace} 
 \setlength{\bibhang}{0em}
