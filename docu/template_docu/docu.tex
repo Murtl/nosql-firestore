@@ -298,6 +298,8 @@ Dadurch entstehen, insbesondere bei komplexeren Abfragen wie den Teilaufgaben m)
 
 Diese Einschränkungen zeigen exemplarisch, dass NoSQL-Systeme wie Firestore zwar flexibel in der Datenmodellierung sind, jedoch bei komplexeren Auswertungen oft zusätzliche clientseitige Logik erforderlich machen.
 
+% Hier noch das mit der gruppen-sub-collection abfragen hinzufügen etc.
+
 \chapter{Herausforderungen bei den Update-Abfragen}
 \label{update-label}
 
@@ -318,7 +320,7 @@ In dem vorher erläutertem Beispiel ist der Einsatz von \texttt{Transaktionen} d
 	\centering
 	\includegraphics[width=\linewidth]{img/BatchUpdate.png}
 	\caption{Beispiel für Updates mit Batch}
-	\label{fig:code-example-0}
+	\label{fig:code-example-1}
 \end{figure}
 
 Trotzdem bleibt zu beachten, dass Firestore keine automatische Änderungsweitergabe (wie \texttt{ON UPDATE CASCADE} in SQL) unterstützt. Entwickler müssen sich dieser Limitierung bewusst sein und gegebenenfalls eigene Routinen oder Skripte entwickeln, um die Konsistenz sicherzustellen.

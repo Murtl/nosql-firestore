@@ -11,11 +11,11 @@ async function aufgabe6() {
     // a) Lösche die Kursliteratur für "C-Programmierung"
     /**
      * @old-relational-table Kurs, KursLiteratur
-     * @collections kurse, kurse/kursliteratur
+     * @collections kurse, kurse/{KursNr}/kursliteratur (Sub-Collection aus kurse)
      *
      * @id
-     *   In "kurse": Dokumenten-ID = KursNr (z.B.: "P13")
-     *   In Subcollection "kursliteratur": Dokumenten-ID = "standard"
+     *   In "kurse": Dokumenten-ID = KursNr (z. B.: "P13")
+     *   In Sub-Collection "kursliteratur": Dokumenten-ID = "standard"
      *
      * @logic
      *   🔸 In SQL:
@@ -27,17 +27,17 @@ async function aufgabe6() {
      *   🔹 In Firestore:
      *      1. Suche im Collection "kurse" nach einem Dokument mit Feld `Titel` == "C-Programmierung".
      *      2. Greife auf das Dokument `kursliteratur/standard` innerhalb des gefundenen Kurses zu.
-     *      3. Lösche das Dokument `standard` in der Subcollection `kursliteratur`.
+     *      3. Lösche das Dokument `standard` in der Sub-Collection `kursliteratur`.
      *
      * @risk
      * Es gibt keine automatische Prüfung oder Foreign-Key-Beziehungen:
-     * - Die Literatur kann gelöscht werden, auch wenn sie noch z.B. in einem Angebot verwendet wird.
+     * - Die Literatur kann gelöscht werden, auch wenn sie noch z. B. in einem Angebot verwendet wird.
      * - Entwickler müssen selbst für Konsistenz sorgen.
      *
      * @difference-to-sql
      * In SQL genügt ein einfacher `DELETE` mit WHERE-Klausel über `KursNr`.
      * In Firestore ist eine Suche nach dem Titel erforderlich,
-     * gefolgt vom Zugriff auf die Subcollection `kursliteratur`, um das "standard"-Dokument zu löschen.
+     * gefolgt vom Zugriff auf die Sub-Collection `kursliteratur`, um das "standard"-Dokument zu löschen.
      */
     const kursSnapshot = await db.collection('kurse')
         .withConverter(createConverter<Kurs>())
@@ -55,12 +55,12 @@ async function aufgabe6() {
     // b) Lösche alle Kursangebote mit weniger als 2 Teilnehmern
     /**
      * @old-relational-table Nimmt_teil, Angebot, Gebühren
-     * @collections angebote, teilnehmer, teilnehmer/teilnahmen
+     * @collections angebote, teilnehmer, teilnehmer/{TnNr}/teilnahmen (Sub-Collection aus teilnehmer)
      *
      * @id
      *   In "angebote": Dokumenten-ID = AngNr_KursNr (z.B.: "2_P13")
      *   In "teilnehmer": Dokumenten-ID = TnNr
-     *   In Subcollection "teilnahmen": Feld AngNr_KursNr referenziert Angebot
+     *   In Sub-Collection "teilnahmen": Feld AngNr_KursNr referenziert Angebot
      *
      * @logic
      *   🔸 In SQL:
@@ -92,13 +92,12 @@ async function aufgabe6() {
      *      - Ohne Transaktionen oder Batch-Operationen kann es zu Inkonsistenzen beim Löschen kommen
      *
      * @difference-to-sql
-     * - In Firestore gibt es KEIN JOIN + WHERE + DELETE + GROUP BY oder CASCADEN-Delete.
+     * - In Firestore gibt es KEINE Kombination aus JOIN + WHERE + DELETE + GROUP BY oder CASCADEN-Delete.
      * - In SQL kann man JOINS und Bedingungen direkt im DELETE kombinieren.
      * - In Firestore müssen Dokumente einzeln geladen und verglichen werden.
      * - Zählung und Selektion müssen manuell in der Applikation durchgeführt werden.
-     * - Zudem erfolgt die Navigation zu "teilnahmen" über die Subcollection jedes Teilnehmers.
+     * - Zudem erfolgt die Navigation zu "teilnahmen" über die Sub-Collection jedes Teilnehmers.
      */
-
       const angeboteSnapshot = await db.collection('angebote').withConverter(createConverter<Angebot>()).get();
       const teilnehmerSnapshot = await db.collection('teilnehmer').withConverter(createConverter<Teilnehmer>()).get();
 
@@ -143,71 +142,74 @@ async function aufgabe6() {
       }
 
 
-  /*
-    // Hinweis: Zusatz zu Aufgabe b - Löschen von Angeboten mit <2 Teilnehmern
-    // Transaktion und Batch-Operationen für konsistente Löschvorgänge bei großen Datenmengen
-    const angeboteSnapshot = await db.collection('angebote').withConverter(createConverter<Angebot>()).get();
-    const teilnehmerSnapshot = await db.collection('teilnehmer').withConverter(createConverter<Teilnehmer>()).get();
+    /**
+     * Hinweis: Zusatz zu Aufgabe b - Löschen von Angeboten mit <2 Teilnehmern
+     * Transaktion und Batch-Operationen für konsistente Löschvorgänge bei großen Datenmengen
+     *
+     * const angeboteSnapshot = await db.collection('angebote').withConverter(createConverter<Angebot>()).get();
+     * const teilnehmerSnapshot = await db.collection('teilnehmer').withConverter(createConverter<Teilnehmer>()).get();
+     *
+     * Zähle die Teilnehmer pro Angebot
+     *  const angebotTeilnahmeZaehler: Record<string, number> = {};
+     *  for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
+     *  const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
+     *  for (const t of teilnahmenSnap.docs) {
+     *      const { AngNr } = t.data() as Teilnahme;
+     *      angebotTeilnahmeZaehler[AngNr] = (angebotTeilnahmeZaehler[AngNr] || 0) + 1;
+     *      }
+     *  }
+     *
+     *  const zuLoeschendeAngebote: string[] = [];
+     *
+     *  await db.runTransaction(async (transaction) => {
+     *      for (const angebotDoc of angeboteSnapshot.docs) {
+     *          const angebotId = angebotDoc.id;
+     *          const teilnehmerAnzahl = angebotTeilnahmeZaehler[angebotId] || 0;
+     *
+     *          if (teilnehmerAnzahl < 2) {
+     *              const kursleiterSnap = await angebotDoc.ref.collection('kursleiter').get();
+     *              kursleiterSnap.docs.forEach(kursleiterDoc => {
+     *                  transaction.delete(kursleiterDoc.ref);
+     *              });
+     *
+     *              transaction.delete(angebotDoc.ref);
+     *              zuLoeschendeAngebote.push(angebotId);
+     *
+     *              console.log(`🗑️ Angebot ${angebotId} gelöscht in Transaktion (nur ${teilnehmerAnzahl} Teilnehmer).`);
+     *          }
+     *      }
+     *  });
+     *
+     *  BATCH: Lösche verknüpfte Teilnahmen
+     *  let batch = db.batch();
+     *  let opCount = 0;
+     *  const MAX_BATCH_OPS = 490;
+     *
+     *  for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
+     *      const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
+     *      for (const teilnahmeDoc of teilnahmenSnap.docs) {
+     *          const { AngNr } = teilnahmeDoc.data() as Teilnahme;
+     *          if (zuLoeschendeAngebote.includes(AngNr)) {
+     *              batch.delete(teilnahmeDoc.ref);
+     *              console.log(`🗑️ Teilnahme ${teilnahmeDoc.id} gelöscht (bezog sich auf Angebot ${AngNr}).`);
+     *
+     *              opCount++;
+     *              if (opCount >= MAX_BATCH_OPS) {
+     *                  await batch.commit();
+     *                  batch = db.batch();
+     *                  opCount = 0;
+     *             }
+     *          }
+     *    }
+     *  }
+     *
+     *  if (opCount > 0) {
+     *      await batch.commit();
+     *  }
+     */
 
-    // Zähle die Teilnehmer pro Angebot
-    const angebotTeilnahmeZaehler: Record<string, number> = {};
-    for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
-        const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
-        for (const t of teilnahmenSnap.docs) {
-            const { AngNr } = t.data() as Teilnahme;
-            angebotTeilnahmeZaehler[AngNr] = (angebotTeilnahmeZaehler[AngNr] || 0) + 1;
-        }
-    }
 
-    const zuLoeschendeAngebote: string[] = [];
-
-    await db.runTransaction(async (transaction) => {
-    for (const angebotDoc of angeboteSnapshot.docs) {
-              const angebotId = angebotDoc.id;
-              const teilnehmerAnzahl = angebotTeilnahmeZaehler[angebotId] || 0;
-
-              if (teilnehmerAnzahl < 2) {
-                  const kursleiterSnap = await angebotDoc.ref.collection('kursleiter').get();
-                  kursleiterSnap.docs.forEach(kursleiterDoc => {
-                      transaction.delete(kursleiterDoc.ref);
-                  });
-
-                  transaction.delete(angebotDoc.ref);
-                  zuLoeschendeAngebote.push(angebotId);
-
-                  console.log(`🗑️ Angebot ${angebotId} gelöscht in Transaktion (nur ${teilnehmerAnzahl} Teilnehmer).`);
-              }
-          }
-      });
-
-    // BATCH: Lösche verknüpfte Teilnahmen
-    let batch = db.batch();
-    let opCount = 0;
-    const MAX_BATCH_OPS = 490;
-
-    for (const teilnehmerDoc of teilnehmerSnapshot.docs) {
-        const teilnahmenSnap = await teilnehmerDoc.ref.collection('teilnahmen').get();
-        for (const teilnahmeDoc of teilnahmenSnap.docs) {
-            const { AngNr } = teilnahmeDoc.data() as Teilnahme;
-            if (zuLoeschendeAngebote.includes(AngNr)) {
-                batch.delete(teilnahmeDoc.ref);
-                console.log(`🗑️ Teilnahme ${teilnahmeDoc.id} gelöscht (bezog sich auf Angebot ${AngNr}).`);
-
-                opCount++;
-                if (opCount >= MAX_BATCH_OPS) {
-                    await batch.commit();
-                    batch = db.batch();
-                    opCount = 0;
-                }
-            }
-        }
-    }
-    if (opCount > 0) {
-        await batch.commit();
-    }
-   */
-
-console.log('\n✅ Löschvorgänge abgeschlossen.');
+    console.log('\n✅ Löschvorgänge abgeschlossen.');
 }
 
 aufgabe6().catch(console.error);

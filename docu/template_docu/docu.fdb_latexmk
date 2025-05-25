@@ -1,18 +1,18 @@
 # Fdb version 4
-["biber docu"] 1748009875.0847 "docu.bcf" "docu.bbl" "docu" 1748009889.93907 0
-  "Literatur_docu.bib" 1748009865 3242 467f561872fabed73b69982903b8f730 ""
-  "docu.bcf" 1748009889 108499 bed17b761a9047dcf6853038b433cb3c "pdflatex"
+["biber docu"] 1748170155.89808 "docu.bcf" "docu.bbl" "docu" 1748170175.19539 0
+  "Literatur_docu.bib" 1748161091 4061 e51209ada97540ce0bd15e1aaaf3b152 ""
+  "docu.bcf" 1748170174 108752 f7ba243c77bfd78b6ac6149fb7ae2eaf "pdflatex"
   (generated)
   "docu.bbl"
   "docu.blg"
   (rewritten before read)
-["makeindex docu.idx"] 1748009756.15711 "docu.idx" "docu.ind" "docu" 1748009889.93868 0
-  "docu.idx" 1748009888 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+["makeindex docu.idx"] 1748009756.15711 "docu.idx" "docu.ind" "docu" 1748170175.19504 0
+  "docu.idx" 1748170173 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   (generated)
   "docu.ilg"
   "docu.ind"
   (rewritten before read)
-["pdflatex"] 1748009885.86723 "docu.tex" "docu.pdf" "docu" 1748009889.93965 0
+["pdflatex"] 1748170170.85457 "docu.tex" "docu.pdf" "docu" 1748170175.19602 0
   "C:/Users/michi/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1747832841 175784 d01d0429261f1720986894a4030d3f6b ""
   "C:/Users/michi/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1744701663 13148213 5de536e2cf3c9b416effffce298c4a28 ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc" 1458473887 4993 80dc9bab7f31fb78a000ccfed0e27cab ""
@@ -297,23 +297,24 @@
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/tex/latex/xkeyval/xkeyval.sty" 1656236919 4937 4ce600ce9bd4ec84d0250eb6892fcf4f ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/tex/latex/xpatch/xpatch.sty" 1585221260 8510 7803f78066c4f9d008405191a4b43073 ""
   "C:/Users/michi/AppData/Local/Programs/MiKTeX/tex/latex/xstring/xstring.sty" 1693735632 123 a302f2c651a95033260db60e51527ae8 ""
-  "THA-docu.sty" 1747839886 14220 42d19add6dd8fae33cd637b4c567b242 ""
-  "docu.aux" 1748009889 16215 bb519057ce5ef9695cbd32337cc5b817 "pdflatex"
-  "docu.bbl" 1748009876 10198 0f8cade6aadc71a35bcba724d40d9341 "biber docu"
-  "docu.ind" 1748009756 0 d41d8cd98f00b204e9800998ecf8427e "makeindex docu.idx"
-  "docu.out" 1748009888 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "docu.run.xml" 1748009889 2501 7ec0e66864133b8a69d40a06c96bae0d "pdflatex"
-  "docu.tex" 1748009694 31436 0250d32fb2b33e0595f6f05370f52b5d ""
-  "docu.toc" 1748009889 1365 bd6391a034826e038e0f27e70fa4bc00 "pdflatex"
-  "i18n/de.tex" 1747812780 1682 e3e939d91ad64424f38a02766a3f12d3 ""
+  "THA-docu.sty" 1748161091 14220 42d19add6dd8fae33cd637b4c567b242 ""
+  "docu.aux" 1748170174 17587 4eb828f516ad656b4d8c41a32abe7016 "pdflatex"
+  "docu.bbl" 1748170161 13459 fb2d657387d1fafc0ade3bffb2b0cc0f "biber docu"
+  "docu.ind" 1748161091 0 d41d8cd98f00b204e9800998ecf8427e "makeindex docu.idx"
+  "docu.out" 1748170173 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "docu.run.xml" 1748170174 2501 7ec0e66864133b8a69d40a06c96bae0d "pdflatex"
+  "docu.tex" 1748170008 33210 54afdd8fe505b6ea3cdb6e4a5c8c8f65 ""
+  "docu.toc" 1748170174 1366 718410750621b71d50a35d78c8bedbcc "pdflatex"
+  "i18n/de.tex" 1748161091 1689 7065b1203c622f226e3c97ef614bb4f0 ""
+  "img/BatchUpdate.png" 1748161091 117616 db954e0904252885b8d68f9c24301cd3 ""
   "img/Logo.pdf" 1747812780 62407 11c5a33fdb2a7353a3748cf5cb3e3b5a ""
-  "img/SQL_DUMP_ERM.png" 1747825957 155901 fc39074fc43d0706e8d726e0c6d3c302 ""
-  "img/StrukturFirestore.png" 1747820586 372940 1ec2a39aaccccae8f88c4c1bbe9594df ""
-  "img/code_example_0.png" 1747832907 24551 f74529a6b9c8d00a61bb97d23427f99a ""
-  "img/converter.png" 1747836923 26778 bd0452b4ac532c9f79de48cab3b816ee ""
-  "img/converter_example.png" 1747837341 30791 289768b5d1e00fa17b620b3a618a9734 ""
-  "img/emulator_ui.png" 1747833540 101930 5ee4b66747d8823de9e24519960ed27b ""
-  "img/types.png" 1747836668 19580 858d7751221ec24105ccf7a79d46539d ""
+  "img/SQL_DUMP_ERM.png" 1748161091 155901 fc39074fc43d0706e8d726e0c6d3c302 ""
+  "img/StrukturFirestore.png" 1748161091 372940 1ec2a39aaccccae8f88c4c1bbe9594df ""
+  "img/code_example_0.png" 1748161091 24551 f74529a6b9c8d00a61bb97d23427f99a ""
+  "img/converter.png" 1748161091 26778 bd0452b4ac532c9f79de48cab3b816ee ""
+  "img/converter_example.png" 1748161091 30791 289768b5d1e00fa17b620b3a618a9734 ""
+  "img/emulator_ui.png" 1748161091 101930 5ee4b66747d8823de9e24519960ed27b ""
+  "img/types.png" 1748161091 19580 858d7751221ec24105ccf7a79d46539d ""
   (generated)
   "docu.Ridx"
   "docu.aux"
