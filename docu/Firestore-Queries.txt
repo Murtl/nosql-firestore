@@ -1,10 +1,10 @@
 ### Alle durchgeführten Anfragen
 
 Firestore-Queries.txt Datei der Gruppe 05 mit der Datenbank Firestore und dem Projektteam:
-Peter Fischer -
+Peter Fischer - 2210654
 Leonelle Tifani Kommegne Kammegne -
 Michael Mertl - 2209076
-Gregor Pfister -
+Gregor Pfister - 2209779
 Jana Sophie Schweizer - 2209427
 
 Nachfolgend sind die Abfragen für die einzelnen Aufgaben der Semesteraufgabe aufgelistet. Dabei wird zuerst die von

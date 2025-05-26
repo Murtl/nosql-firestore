@@ -178,7 +178,7 @@
 %%% defining the header
 %%% --------------------
 \pagestyle{scrheadings}
-\ohead{\pagemark}
+%\ohead{\pagemark}
 \rehead{\rightmark}
 \lohead{\leftmark}
 \ihead{\headmark}
@@ -187,7 +187,8 @@
 \setkomafont{pagenumber}{\normalfont\sffamily}
 % leere fusszeile:
 \lefoot{}\rofoot{}
-\ofoot{}\cfoot{} % Fusszeile bei einseitigem Druck
+%\ofoot{}\cfoot{} % Fusszeile bei einseitigem Druck
+\cfoot{\pagemark}
 
 \newcommand{\Ridx}[1]{\cd{#1}\index{R Kommandos@\R Kommandos!#1@\cd{#1}}}
 \newcommand{\idx}[1]{\index{#1}}

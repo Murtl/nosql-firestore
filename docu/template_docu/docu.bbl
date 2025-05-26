@@ -99,8 +99,23 @@
       \endverb
     \endentry
     \entry{FirebaseDatenmodell.2025}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=035489ff8d092741943e4a83241f5af9}{%
+           family={Firebase},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \strng{bibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorbibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \field{extraname}{2}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{note}{Zuletzt aktualisiert am: 13.05.2025. Zuletzt abgerufen am: 21.05.2025}
       \field{title}{Cloud Firestore-Datenmodell}
@@ -114,18 +129,20 @@
     \endentry
     \entry{GoogleCloudQueries.2025}{misc}{}{}
       \name{author}{1}{}{%
-        {{hash=57f3af2a3d1051c172ab3c3db7d5409d}{%
-           family={{Google Cloud}},
-           familyi={G\bibinitperiod}}}%
+        {{hash=b4e595bd8646c01df540ff38696a35be}{%
+           family={Cloud},
+           familyi={C\bibinitperiod},
+           given={Google},
+           giveni={G\bibinitperiod}}}%
       }
-      \strng{namehash}{57f3af2a3d1051c172ab3c3db7d5409d}
-      \strng{fullhash}{57f3af2a3d1051c172ab3c3db7d5409d}
-      \strng{fullhashraw}{57f3af2a3d1051c172ab3c3db7d5409d}
-      \strng{bibnamehash}{57f3af2a3d1051c172ab3c3db7d5409d}
-      \strng{authorbibnamehash}{57f3af2a3d1051c172ab3c3db7d5409d}
-      \strng{authornamehash}{57f3af2a3d1051c172ab3c3db7d5409d}
-      \strng{authorfullhash}{57f3af2a3d1051c172ab3c3db7d5409d}
-      \strng{authorfullhashraw}{57f3af2a3d1051c172ab3c3db7d5409d}
+      \strng{namehash}{b4e595bd8646c01df540ff38696a35be}
+      \strng{fullhash}{b4e595bd8646c01df540ff38696a35be}
+      \strng{fullhashraw}{b4e595bd8646c01df540ff38696a35be}
+      \strng{bibnamehash}{b4e595bd8646c01df540ff38696a35be}
+      \strng{authorbibnamehash}{b4e595bd8646c01df540ff38696a35be}
+      \strng{authornamehash}{b4e595bd8646c01df540ff38696a35be}
+      \strng{authorfullhash}{b4e595bd8646c01df540ff38696a35be}
+      \strng{authorfullhashraw}{b4e595bd8646c01df540ff38696a35be}
       \field{sortinit}{2}
       \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
@@ -141,8 +158,23 @@
       \endverb
     \endentry
     \entry{EmulatorSuite.2025}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=035489ff8d092741943e4a83241f5af9}{%
+           family={Firebase},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \strng{bibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorbibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \field{extraname}{3}
       \field{sortinit}{3}
       \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{note}{Zuletzt aktualisiert am: 08.05.2025. Zuletzt abgerufen am: 21.05.2025}
       \field{title}{Einf\"{u}hrung in die Firebase Local Emulator Suite}
@@ -155,11 +187,26 @@
       \endverb
     \endentry
     \entry{EmulatorInsall.2025}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=035489ff8d092741943e4a83241f5af9}{%
+           family={Firebase},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \strng{bibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorbibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \field{extraname}{4}
       \field{sortinit}{4}
       \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{note}{Zuletzt aktualisiert am: 08.05.2025. Zuletzt abgerufen am: 21.05.2025}
-      \field{title}{Local Emulator Suite installieren, konfigurieren und integrieren {\&}nbsp;|{\&}nbsp; Firebase Local Emulator Suite}
+      \field{title}{Local Emulator Suite installieren, konfigurieren und integrieren}
       \field{year}{08.05.2025}
       \verb{urlraw}
       \verb https://firebase.google.com/docs/emulator-suite/install_and_configure?hl=de
@@ -170,18 +217,20 @@
     \endentry
     \entry{Estuary.2025}{misc}{}{}
       \name{author}{1}{}{%
-        {{hash=ac86bc6c731db363e045cfd59cb3025c}{%
-           family={Estuary},
-           familyi={E\bibinitperiod}}}%
+        {{hash=738a008e041bcdb43cddb9143e00532c}{%
+           family={Richman},
+           familyi={R\bibinitperiod},
+           given={Jeffrey},
+           giveni={J\bibinitperiod}}}%
       }
-      \strng{namehash}{ac86bc6c731db363e045cfd59cb3025c}
-      \strng{fullhash}{ac86bc6c731db363e045cfd59cb3025c}
-      \strng{fullhashraw}{ac86bc6c731db363e045cfd59cb3025c}
-      \strng{bibnamehash}{ac86bc6c731db363e045cfd59cb3025c}
-      \strng{authorbibnamehash}{ac86bc6c731db363e045cfd59cb3025c}
-      \strng{authornamehash}{ac86bc6c731db363e045cfd59cb3025c}
-      \strng{authorfullhash}{ac86bc6c731db363e045cfd59cb3025c}
-      \strng{authorfullhashraw}{ac86bc6c731db363e045cfd59cb3025c}
+      \strng{namehash}{738a008e041bcdb43cddb9143e00532c}
+      \strng{fullhash}{738a008e041bcdb43cddb9143e00532c}
+      \strng{fullhashraw}{738a008e041bcdb43cddb9143e00532c}
+      \strng{bibnamehash}{738a008e041bcdb43cddb9143e00532c}
+      \strng{authorbibnamehash}{738a008e041bcdb43cddb9143e00532c}
+      \strng{authornamehash}{738a008e041bcdb43cddb9143e00532c}
+      \strng{authorfullhash}{738a008e041bcdb43cddb9143e00532c}
+      \strng{authorfullhashraw}{738a008e041bcdb43cddb9143e00532c}
       \field{sortinit}{5}
       \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
@@ -197,23 +246,30 @@
       \verb https://estuary.dev/blog/firestore-query-best-practices/
       \endverb
     \endentry
-    \entry{FirebaseComparison.2025}{misc}{}{}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
-      \field{labeltitlesource}{title}
-      \field{note}{Zuletzt aktualisiert am: 13.05.2025. Zuletzt abgerufen am: 23.05.2025}
-      \field{title}{Datenbank ausw\"{a}hlen: Cloud Firestore oder Realtime Database}
-      \field{year}{13.05.2025}
-      \verb{urlraw}
-      \verb https://firebase.google.com/docs/firestore/rtdb-vs-firestore?hl=de
-      \endverb
-      \verb{url}
-      \verb https://firebase.google.com/docs/firestore/rtdb-vs-firestore?hl=de
-      \endverb
-    \endentry
     \entry{MoldStud.2025}{misc}{}{}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \name{author}{2}{}{%
+        {{hash=5dc77137abebb5e4b8c8ac54f2cf9d79}{%
+           family={Andersen},
+           familyi={A\bibinitperiod},
+           given={Grady},
+           giveni={G\bibinitperiod}}}%
+        {{hash=252753b4e2053d169370f91c05b9154e}{%
+           family={Team},
+           familyi={T\bibinitperiod},
+           given={MoldStud\bibnamedelima Research},
+           giveni={M\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{844f97af9996caa3bbdab4a8828f2898}
+      \strng{fullhash}{844f97af9996caa3bbdab4a8828f2898}
+      \strng{fullhashraw}{844f97af9996caa3bbdab4a8828f2898}
+      \strng{bibnamehash}{844f97af9996caa3bbdab4a8828f2898}
+      \strng{authorbibnamehash}{844f97af9996caa3bbdab4a8828f2898}
+      \strng{authornamehash}{844f97af9996caa3bbdab4a8828f2898}
+      \strng{authorfullhash}{844f97af9996caa3bbdab4a8828f2898}
+      \strng{authorfullhashraw}{844f97af9996caa3bbdab4a8828f2898}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{note}{Zuletzt aktualisiert am: 11.05.2025. Zuletzt abgerufen am: 23.05.2025}
       \field{title}{How Data Models Affect Normalization \& Denormalization in NoSQL Databases}
@@ -225,18 +281,121 @@
       \verb https://moldstud.com/articles/p-how-data-models-affect-normalization-denormalization-in-nosql-databases
       \endverb
     \endentry
-    \entry{FirebasebaseTransaktionenBatches.2025}{misc}{}{}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+    \entry{FirebaseConverter.2022}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=035489ff8d092741943e4a83241f5af9}{%
+           family={Firebase},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \strng{bibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorbibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \field{extraname}{5}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{note}{Zuletzt aktualisiert am: 19.05.2025. Zuletzt abgerufen am: 24.05.2025}
-      \field{title}{Transaktionen und Batch-Schreibvorg\"{a}nge}
-      \field{year}{19.05.2025}
+      \field{abstract}{Reference for FirestoreDataConverter}
+      \field{note}{Zuletzt aktualisiert am: 22.07.2022. Zuletzt abgerufen am: 26.05.2025}
+      \field{title}{FirestoreDataConverter}
+      \field{year}{27.07.2022}
       \verb{urlraw}
-      \verb https://firebase.google.com/docs/firestore/manage-data/transactions?hl=de
+      \verb https://firebase.google.com/docs/reference/node/firebase.firestore.FirestoreDataConverter
       \endverb
       \verb{url}
-      \verb https://firebase.google.com/docs/firestore/manage-data/transactions?hl=de
+      \verb https://firebase.google.com/docs/reference/node/firebase.firestore.FirestoreDataConverter
+      \endverb
+    \endentry
+    \entry{FirebaseCount.2025}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=035489ff8d092741943e4a83241f5af9}{%
+           family={Firebase},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \strng{bibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorbibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \field{extraname}{6}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Zuletzt aktualisiert am: 26.05.2025. Zuletzt abgerufen am: 26.05.2025}
+      \field{title}{Daten mit Aggregationsabfragen zusammenfassen}
+      \field{year}{26.05.2025}
+      \verb{urlraw}
+      \verb https://firebase.google.com/docs/firestore/query-data/aggregation-queries?hl=de#use_the_count_aggregation
+      \endverb
+      \verb{url}
+      \verb https://firebase.google.com/docs/firestore/query-data/aggregation-queries?hl=de#use_the_count_aggregation
+      \endverb
+    \endentry
+    \entry{FirebaseComparison.2025}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=035489ff8d092741943e4a83241f5af9}{%
+           family={Firebase},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \strng{bibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorbibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \field{extraname}{7}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Zuletzt aktualisiert am: 13.05.2025. Zuletzt abgerufen am: 23.05.2025}
+      \field{title}{Datenbank ausw\"{a}hlen: Cloud Firestore oder Realtime Database}
+      \field{year}{13.05.2025}
+      \verb{urlraw}
+      \verb https://firebase.google.com/docs/firestore/rtdb-vs-firestore?hl=de
+      \endverb
+      \verb{url}
+      \verb https://firebase.google.com/docs/firestore/rtdb-vs-firestore?hl=de
+      \endverb
+    \endentry
+    \entry{FirebaseSammlung.2025}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=035489ff8d092741943e4a83241f5af9}{%
+           family={Firebase},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \strng{bibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorbibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhashraw}{035489ff8d092741943e4a83241f5af9}
+      \field{extraname}{8}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Zuletzt aktualisiert am: 26.05.2025. Zuletzt abgerufen am: 26.05.2025}
+      \field{title}{Einfache und kumulierende Abfragen in Cloud Firestore ausf\"{u}hren}
+      \field{year}{26.05.2025}
+      \verb{urlraw}
+      \verb https://firebase.google.com/docs/firestore/query-data/queries?hl=de#collection-group-query
+      \endverb
+      \verb{url}
+      \verb https://firebase.google.com/docs/firestore/query-data/queries?hl=de#collection-group-query
       \endverb
     \endentry
     \entry{Firebase.TransaktionenBatch}{misc}{}{}
@@ -253,9 +412,9 @@
       \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
       \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
       \strng{authorfullhashraw}{035489ff8d092741943e4a83241f5af9}
-      \field{extraname}{2}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{extraname}{9}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{note}{Zuletzt aktualisiert am: 23.05.2025. Zuletzt abgerufen am: 24.05.2025}
@@ -282,7 +441,7 @@
       \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
       \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
       \strng{authorfullhashraw}{035489ff8d092741943e4a83241f5af9}
-      \field{extraname}{3}
+      \field{extraname}{10}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
