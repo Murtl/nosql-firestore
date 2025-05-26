@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.3) (preloaded format=pdflatex 2025.4.15)  26 MAY 2025 17:18
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.3) (preloaded format=pdflatex 2025.4.15)  26 MAY 2025 18:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2454,7 +2454,7 @@ Package logreq Info: Writing requests to 'docu.run.xml'.
 Here is how much of TeX's memory you used:
  47055 strings out of 469959
  921306 string characters out of 5469834
- 1913382 words of memory out of 5000000
+ 1913390 words of memory out of 5000000
  72825 multiletter control sequences out of 15000+600000
  731124 words of font info for 234 fonts, out of 8000000 for 9000
  1143 hyphenation exceptions out of 8191
@@ -2470,7 +2470,7 @@ ype1/public/newtx/ztmb.pfb><C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/
 type1/public/newtx/ztmbi.pfb><C:/Users/michi/AppData/Local/Programs/MiKTeX/font
 s/type1/public/newtx/ztmr.pfb><C:/Users/michi/AppData/Local/Programs/MiKTeX/fon
 ts/type1/public/newtx/ztmri.pfb>
-Output written on docu.pdf (23 pages, 1185338 bytes).
+Output written on docu.pdf (23 pages, 1185342 bytes).
 PDF statistics:
  406 PDF objects out of 1000 (max. 8388607)
  74 named destinations out of 1000 (max. 500000)

@@ -2,7 +2,7 @@
 
 Firestore-Queries.txt Datei der Gruppe 05 mit der Datenbank Firestore und dem Projektteam:
 Peter Fischer - 2210654
-Leonelle Tifani Kommegne Kammegne -
+Leonelle Tifani Kommegne Kammegne - 2209740
 Michael Mertl - 2209076
 Gregor Pfister - 2209779
 Jana Sophie Schweizer - 2209427
