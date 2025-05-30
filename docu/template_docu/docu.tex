@@ -119,12 +119,12 @@ Abbildung~\ref{fig:enr-old} zeigt das daraus entstandene ER-Diagramm, das insges
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=\dimexpr0.7\linewidth]{img/SQL_DUMP_ERM.png}
+	\includegraphics[width=\dimexpr0.8\linewidth]{img/SQL_DUMP_ERM.png}
 	\caption{Entity-Relationship-Diagramm der ursprünglichen relationalen Struktur}
 	\label{fig:enr-old}
 \end{figure}
 
-Auf Basis dieser Analyse mussten wir uns für eine NoSQL-Datenbank entschieden. Die Entscheidung und die Gründe für die jeweilige NoSQL-Datenbank wird nachfolgend beschrieben in Kapitel 2~\ref{entscheidung-chapter} (\glqq Entscheidung für eine NoSQL-Datenbank\grqq{}).
+Auf Basis dieser Analyse mussten wir uns für eine NoSQL-Datenbank entschieden. Die Entscheidung und die Gründe für die jeweilige NoSQL-Datenbank wird nachfolgend beschrieben in Kapitel~\ref{entscheidung-chapter} (\glqq Entscheidung für eine NoSQL-Datenbank\grqq{}).
 
 \chapter{Entscheidung für eine NoSQL-Datenbank}
 \label{entscheidung-chapter}
@@ -137,7 +137,7 @@ Nach einer kurzen Recherche hinsichtlich Verbreitung, Dokumentation und Communit
 
 Google Cloud Firestore ist eine dokumentenbasierte NoSQL-Datenbank, in der Daten in sogenannten \textit{Collections} organisiert sind. Jede \textit{Collection} kann beliebig viele \textit{Dokumente} enthalten, die wiederum hierarchisch strukturierte \textit{Sub-Collections} besitzen können. 
 
-Die einzelnen Dokumente bestehen aus Feldern in Form von Schlüssel-Wert-Paaren und ähneln in ihrer Struktur stark JSON-Objekten. Dieses flexible Datenmodell ermöglicht die effiziente Speicherung von semistrukturierten Informationen.
+Die einzelnen Dokumente bestehen aus Feldern in Form von Schlüssel-Wert-Paaren und ähneln in ihrer Struktur stark \textit{JSON-Objekten}. Dieses flexible Datenmodell ermöglicht die effiziente Speicherung von semistrukturierten Informationen.
 
 Zu den zentralen Merkmalen von Firestore gehören die Unterstützung verschachtelter Datenstrukturen, Arrays, Referenzen auf andere Dokumente sowie spezielle Datentypen wie Zeitstempel. Dadurch lassen sich auch komplexe, objektähnliche Datenmodelle direkt und modellnah abbilden \cite{Kesavan.2023, Firebase.2025, FirebaseDatenmodell.2025}. Nachfolgend zeigt Abbildung~\ref{fig:struktur-example} ein Datenstruktur-Beispiel in Firestore:
 
@@ -222,14 +222,14 @@ Aus den insgesamt neun relationalen Tabellen wurden vier \textit{Haupt-Collectio
 
 \begin{itemize}
 	\item In \textit{kurse} befinden sich die \textit{Sub-Collections} \textit{kursliteratur} (ursprünglich: \textit{KursLiteratur}) und \textit{voraussetzungen} (ursprünglich: \textit{Vorauss}).
-	\item In \textit{teilnehmer} ist die \textit{Sub-Collection} \textit{teilnahmen} untergebracht (ursprünglich: \textit{Nimmt\_teil}), wobei die ehemals separate Tabelle \textit{Gebuehren} nun als Feld innerhalb der Teilnahme gespeichert ist.
+	\item In \textit{teilnehmer} ist die \textit{Sub-Collection} \textit{teilnahmen} untergebracht (ursprünglich: \textit{Nimmt\_teil}), wobei die ehemals separate Tabelle \textit{Gebuehren} nun als Feld innerhalb eines \textit{teilnahme Dokuments} gespeichert ist.
 	\item Die \textit{Collection kursleiter} entspricht nahezu direkt der alten Tabelle gleichen Namens.
 	\item Die \textit{Collection angebote} wurde am stärksten angepasst: Neben der \textit{Sub-Collection} \textit{kursleiter}, in der relevante Kursleiterdaten (redundant) gespeichert sind, wird dort zusätzlich der \textit{KursTitel} direkt im Angebot abgelegt.
 \end{itemize}
 
 Die redundante Speicherung des Kurstitels sowie der Kursleiterdaten wurde bewusst gewählt. In Firestore sind komplexe \textit{JOINs}, wie sie in relationalen Datenbanken üblich sind, nicht möglich. Um performante Abfragen zu ermöglichen und unnötige Mehrfachabfragen zu vermeiden, ist diese strategische Denormalisierung sogar empfohlen und gilt als \textit{Best Practice} im Umgang mit NoSQL-Datenbanken, um bestimmte, häufig vorkommende Abfragen um bis zu 50\% zu beschleunigen \cite{Estuary.2025, MoldStud.2025}.
 
-Insgesamt entspricht die von uns gewählte Struktur dem Paradigma einer dokumentenorientierten Datenbank. Sie erwies sich im Verlauf der Umsetzung als robust und praxistauglich, insbesondere im Hinblick auf die Bearbeitung der gestellten Aufgaben. Gleichzeitig bringt die Entscheidung für redundante Datenhaltung gewisse Herausforderungen mit sich – insbesondere bei \textit{update}- und \textit{delete}-Operationen. Diese Aspekte werden im Kapiteln~\ref{update-delete-chapter} (\glqq Herausforderungen bei den Update- \& Delete-Abfragen\grqq{}) näher erläutert.
+Insgesamt entspricht die von uns gewählte Struktur dem Paradigma einer dokumentenorientierten Datenbank. Sie erwies sich im Verlauf der Umsetzung als robust und praxistauglich, insbesondere im Hinblick auf die Bearbeitung der gestellten Aufgaben. Gleichzeitig bringt die Entscheidung für redundante Datenhaltung gewisse Herausforderungen mit sich – insbesondere bei \textit{update}- und \textit{delete}-Operationen. Diese Aspekte werden im Kapitel~\ref{update-delete-chapter} (\glqq Herausforderungen bei den Update- \& Delete-Abfragen\grqq{}) näher erläutert.
 
 \chapter{Typsicherheit und Abfragen mit TypeScript}
 \label{typ-sicherheit-chapter}
@@ -292,7 +292,7 @@ Besonderes Augenmerk lag auf der korrekten Behandlung von \textit{Sub-Collection
 	\label{fig:load_example}
 \end{figure}
 
-Abbildung~\ref{fig:load_example} zeigt die Erstellung des \textit{Kurs-Converters}, der anschließend in der \textit{main-Methode} des TypeScript scripts genutzt wird, um die \textit{kurse.json} mithilfe der \textit{loadStructuredData} Funktion nach Firestore zu schreiben. Hierbei werden in der Funktion die einzelnen Schritte für die \textit{Sub-Collections kursliteratur und voraussetzungen} ebenfalls veranschaulicht, um die gesamten Kurs-Daten ordnungsgemäß initial zu laden.
+Abbildung~\ref{fig:load_example} zeigt die Erstellung des \textit{Kurs-Converters}, der anschließend in der \textit{main-Methode} des TypeScript Skripts genutzt wird, um die \textit{kurse.json} mithilfe der \textit{loadStructuredData} Funktion nach Firestore zu schreiben. Hierbei werden in der Funktion die einzelnen Schritte für die \textit{Sub-Collections kursliteratur und voraussetzungen} ebenfalls veranschaulicht, um die gesamten Kurs-Daten ordnungsgemäß initial zu laden.
 
 Obwohl dieser Initialimport technisch gesehen relativ einfach umzusetzen war, musste er sehr sorgfältig durchgeführt werden, um sicherzustellen, dass sämtliche Daten im richtigen Format und an der korrekten Stelle gespeichert werden. Nur so konnten wir garantieren, dass alle nachfolgenden Abfragen erwartungsgemäß funktionieren.
 
@@ -314,7 +314,7 @@ Bei der Umsetzung der Leseabfragen in Firestore traten mehrere Einschränkungen 
 	Dies führt bei größeren Datenmengen zu einem erheblichen Mehraufwand und einer höheren Anzahl an Leseoperationen – was sich negativ auf die Performance und potenziell auf die Kosten auswirken kann. Wie bereits in Kapitel~\ref{struktur-chapter} (\glqq Aufbau der Datenstruktur\grqq{}) erwähnt, haben wir deshalb zum Teil Redundanzen in unserer Datenstruktur für effizientere Abfragen.\newline
 	
 	\item \textbf{Eingeschränkte Aggregatfunktionen:}
-    Firestore unterstützt inzwischen einfache Aggregationen wie \textit{count()}, allerdings nur für die Gesamtanzahl von Dokumenten, die bestimmte Kriterien erfüllen \cite{FirebaseCount.2025}. Komplexe Aggregationen wie \textit{GROUP BY} oder \textit{HAVING COUNT(*)}, wie sie in SQL üblich sind, sind in Firestore weiterhin nicht möglich. In Aufgabe \textbf{i)} (Kurse mit mindestens zwei Teilnehmern) musste daher in Firestore ein eigenes Zählerobjekt im Anwendungscode erstellt werden, das sämtliche \textit{Teilnahme-Dokumente} durchläuft und die Anzahl pro Kursangebot manuell berechnet. Nachfolgend veranschaulicht Abbildung~\ref{fig:agg_example} die konkrete Umsetzung der Aufgabe i) auf Grund von fehlender eingeschränkter Aggregatfunktionen in Firestore:
+    Firestore unterstützt inzwischen einfache Aggregationen wie \textit{count()}, allerdings nur für die Gesamtanzahl von Dokumenten, die bestimmte Kriterien erfüllen \cite{FirebaseCount.2025}. Komplexe Aggregationen wie \textit{GROUP BY} oder \textit{HAVING COUNT(*)}, wie sie in SQL üblich sind, sind in Firestore weiterhin nicht möglich. In Aufgabe \textbf{i)} (Kurse mit mindestens zwei Teilnehmern) musste daher in Firestore ein eigenes Zählerobjekt im Anwendungscode erstellt werden, das sämtliche \textit{Teilnahme-Dokumente} durchläuft und die Anzahl pro Kursangebot manuell berechnet. Nachfolgend veranschaulicht Abbildung~\ref{fig:agg_example} die konkrete Umsetzung der Aufgabe \textbf{i)} auf Grund von fehlender eingeschränkter Aggregatfunktionen in Firestore:
     
     \begin{figure}[H]
     	\centering
@@ -392,7 +392,7 @@ Die Migration einer relationalen Kursdatenbank in eine dokumentenbasierte NoSQL-
 
 Durch die Verwendung von \textit{TypeScript} und \textit{Convertern} konnten wir diesem schemalosen Ansatz eine starke Typsicherheit entgegensetzen und so sowohl bei der Datenmodellierung als auch bei der Datenverarbeitung präzise und konsistente Strukturen gewährleisten. Besonders hilfreich war dieser Ansatz im Kontext der ursprünglichen relationalen Struktur, da wir so viele der alten Konzepte typisiert beibehalten konnten.
 
-Die Herausforderungen im Bereich der Lese-, Update- und Delete-Operationen haben deutlich gemacht, dass NoSQL-Systeme zwar hohe Flexibilität bieten, dafür aber auf Kosten automatischer Konsistenzmechanismen und vor allem Performanz. Durch manuelle Scripte und gezielte angepasste sowie redundante Datenmodellierung konnten wir hier aber ebenfalls viel erreichen und den Einschränkungen entgegenwirken.
+Die Herausforderungen im Bereich der Lese-, Update- und Delete-Operationen haben deutlich gemacht, dass NoSQL-Systeme zwar hohe Flexibilität bieten, dafür aber auf Kosten automatischer Konsistenzmechanismen und vor allem Performanz. Durch manuelle Skripte und gezielte angepasste sowie redundante Datenmodellierung konnten wir hier aber ebenfalls viel erreichen und den Einschränkungen entgegenwirken.
 
 Abschließend lässt sich sagen, dass dokumentenbasierte Datenbanken wie Firestore ideal für Projekte mit semistrukturierten Daten und klar definierten Zugriffsmustern geeignet sind. Das Projekt hat nicht nur unsere Kenntnisse in Firestore, TypeScript und NoSQL-Datenmodellierung vertieft, sondern auch ein praktisches Verständnis dafür geschaffen, wie sich ein klassisches relationales Datenbankmodell in eine moderne, flexible NoSQL Datenbank überführen lässt.
 

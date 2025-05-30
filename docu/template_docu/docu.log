@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.3) (preloaded format=pdflatex 2025.4.15)  26 MAY 2025 18:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.3) (preloaded format=pdflatex 2025.4.15)  30 MAY 2025 10:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2155,7 +2155,7 @@ Package biblatex Info: Setting label 'refsegment:02' on input line 111.
 File: img/SQL_DUMP_ERM.png Graphic file (type png)
 <use img/SQL_DUMP_ERM.png>
 Package pdftex.def Info: img/SQL_DUMP_ERM.png  used on input line 122.
-(pdftex.def)             Requested size: 321.73364pt x 238.28954pt.
+(pdftex.def)             Requested size: 367.6986pt x 272.3309pt.
 LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
 (Font)              scaled to size 10.95pt on input line 123.
 
@@ -2452,11 +2452,11 @@ Package logreq Info: Writing requests to 'docu.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 47055 strings out of 469959
- 921306 string characters out of 5469834
+ 47057 strings out of 469959
+ 921342 string characters out of 5469834
  1913390 words of memory out of 5000000
  72825 multiletter control sequences out of 15000+600000
- 731124 words of font info for 234 fonts, out of 8000000 for 9000
+ 731257 words of font info for 235 fonts, out of 8000000 for 9000
  1143 hyphenation exceptions out of 8191
  108i,20n,117p,10901b,2481s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtxtt/newt
@@ -2470,7 +2470,7 @@ ype1/public/newtx/ztmb.pfb><C:/Users/michi/AppData/Local/Programs/MiKTeX/fonts/
 type1/public/newtx/ztmbi.pfb><C:/Users/michi/AppData/Local/Programs/MiKTeX/font
 s/type1/public/newtx/ztmr.pfb><C:/Users/michi/AppData/Local/Programs/MiKTeX/fon
 ts/type1/public/newtx/ztmri.pfb>
-Output written on docu.pdf (23 pages, 1185342 bytes).
+Output written on docu.pdf (23 pages, 1185359 bytes).
 PDF statistics:
  406 PDF objects out of 1000 (max. 8388607)
  74 named destinations out of 1000 (max. 500000)
