@@ -2381,10 +2381,13 @@
     <bcf:citekey order="3" intorder="1">EmulatorSuite.2025</bcf:citekey>
     <bcf:citekey order="4" intorder="1">EmulatorInsall.2025</bcf:citekey>
     <bcf:citekey order="5" intorder="1">Estuary.2025</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">FirebaseComparison.2025</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">MoldStud.2025</bcf:citekey>
-    <bcf:citekey order="8" intorder="1">Firebase.TransaktionenBatch</bcf:citekey>
-    <bcf:citekey order="9" intorder="1">Firebase.CloudFunctions</bcf:citekey>
+    <bcf:citekey order="5" intorder="2">MoldStud.2025</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">FirebaseConverter.2022</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">FirebaseCount.2025</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">FirebaseComparison.2025</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">FirebaseSammlung.2025</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">Firebase.TransaktionenBatch</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">Firebase.CloudFunctions</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">
