@@ -18,7 +18,7 @@ async function aufgabe5() {
      *          UPDATE Angebot SET Datum = DATE + INTERVAL '1 year' WHERE EXTRACT(YEAR FROM Datum) = 2023;
      *   🔹 In Firestore:
      *          - laden aller Angebote, bei welchen der Timestamp im Jahr 2023 liegt
-     *          - abändern des Datum Strings
+     *          - abändern des Timestamps
      *          - anschließendes updaten in der Datenbank
      *
      * @difference-to-sql
