@@ -16,9 +16,9 @@ async function aufgabe4() {
     console.log('📖 Aufgabe 4: Read Queries\n');
 
     /**
-     * Man könnte jede Collection bzw. ihre Sub-Collections hier vorladen und den Abfragen nutzen.
+     * Man könnte jede Collection bzw. ihre Sub-Collections hier vorladen und in den Abfragen nutzen.
      * Wir machen das aber nicht so, weil wir die Teilaufgaben jeweils einzeln betrachten wollen, um
-     * die einzelnen nötigen Schritte jeweils zu verdeutlichen
+     * die einzelnen nötigen Schritte jeweils zu verdeutlichen.
     */
 
     // a) alle Orte, an denen Kurse durchgeführt werden
