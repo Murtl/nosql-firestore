@@ -12,18 +12,19 @@ async function aufgabe5() {
     /**
      * @old-relational-table Angebot
      * @collection angebote
+     *
      * @logic
-     *   🔸 In SQL (PostgreSQL) einfache UPDATE-Anweisung:
+     *   🔸 In SQL einfache UPDATE-Anweisung:
      *          UPDATE Angebot SET Datum = DATE + INTERVAL '1 year' WHERE EXTRACT(YEAR FROM Datum) = 2023;
      *   🔹 In Firestore:
      *          - laden aller Angebote, bei welchen der Timestamp im Jahr 2023 liegt
-     *          - abändern des Datum Strings
+     *          - abändern des Timestamps
      *          - anschließendes updaten in der Datenbank
+     *
      * @difference-to-sql
-     *    Laden aller Angebote, welche im Jahr 2023 stattfinden und anschließendes manuelles abändern des Datum, sowie speichern in der Datenbank.
+     *    Laden aller Angebote, welche im Jahr 2023 stattfinden und anschließendes manuelles Abändern des Datums, sowie speichern in der Datenbank.
      *    In SQL erfolgt dies automatisch mit der Update-Anweisung
      */
-
     const startOf2023 = Timestamp.fromDate(new Date("2023-01-01T00:00:00Z"));
     const startOf2024 = Timestamp.fromDate(new Date("2024-01-01T00:00:00Z"));
 
@@ -44,15 +45,17 @@ async function aufgabe5() {
     /**
      * @old-relational-table Angebot
      * @collection angebote
+     *
      * @logic
-     *   🔸 In SQL (PostgreSQL) einfache UPDATE-Anweisung:
+     *   🔸 In SQL einfache UPDATE-Anweisung:
      *          UPDATE Angebot SET Ort = 'Augsburg' WHERE Ort = 'Wedel';
      *
      *   🔹 In Firestore:
      *          - laden aller Angebote mit Ort == 'Wedel'
-     *          - iterieren über aller erhaltenen Angebote mit updaten des Orts in der Datenbank
+     *          - iterieren über alle erhaltenen Angebote mit Updaten des Orts in der Datenbank
+     *
      * @difference-to-sql
-     *    Manuelles updaten der Dokumente.
+     *    Manuelles Updaten der Dokumente.
      */
     const angeboteWedel = await db.collection('angebote')
         .withConverter(createConverter<Angebot>())
@@ -62,6 +65,14 @@ async function aufgabe5() {
         await doc.ref.update({ Ort: 'Augsburg' });
         console.log(`📍 Angebot ${doc.id} von Wedel nach Augsburg verschoben.`);
     }
+
+
+    /**
+     * Sobald man update-Anfragen hat, die mehrere Collections betreffen, bei denen mehrere Daten redundant gehalten werden,
+     * dann sollte man in Betracht ziehen, eine Transaktion oder Batch-Operation zu verwenden. Diese Vorgehensweise
+     * wird beispielhaft bei den delete-Queries als Kommentar am Ende der Datei beschrieben.
+     */
+
 
     console.log('\n✅ Fertig.');
 }
